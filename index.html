@@ -808,13 +808,54 @@ button{cursor:pointer}
 .dp074-review{display:block;font-size:10px;color:#8d3b16;background:#fff0dc;border:1px solid #efbc8d;padding:3px 5px;margin-top:4px;border-radius:6px;white-space:normal}
 .table tbody tr.dp-job-cali .dp074-nonrev{color:#693500;background:#fff1d7}
 .dp074-summary-note{margin:12px 0;padding:9px 12px;border:1px solid #d4e5e5;background:#f6fbfb;border-radius:9px;font-size:11px;color:#365566}
-</style></head>
+</style>
+<style id="v082-compact-board">
+.dp082-capacity-badge{border:1px solid #95beb2;border-radius:999px;padding:6px 12px;background:#ecf8f3;color:#165a45;font-weight:850;font-size:12px;white-space:nowrap;cursor:pointer}
+.dp082-capacity-badge.full{border-color:#d0b89d;background:#fff5e8;color:#89531e}
+.dp082-capacity-badge.unknown{border-color:#d5dfe4;background:#f5f7f8;color:#64747c}
+.dp082-capacity-badge:hover{filter:brightness(.96)}
+.dp078-head .dp078-legend{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.dp078-group-other td{background:#eaf4f5!important;color:#285c69!important}
+.dp082-operational-row td{background:#f8fcfc;border-bottom:1px solid #e0eaec}
+.dp082-operational-row .dp078-money{color:#91a2a9;text-align:right}
+.dp082-person{font-weight:650;font-size:11px;margin:2px 0;line-height:1.35}
+.dp082-unassigned{color:#aa522c;font-weight:750}
+.dp082-kind{display:inline-block;font-size:10px;font-weight:800;color:#285c69;background:#e6f3f5;border:1px solid #cde5e8;border-radius:6px;padding:3px 6px}
+.dp082-cap-tag{display:inline-flex;font-size:10px;color:#476b68;border-radius:5px;border:1px solid #d4e6de;padding:2px 5px;background:#ecf7f2}
+.dp082-cap-tag.no{color:#69777e;background:#f2f4f5;border-color:#dce3e6}
+.dp082-staffing{margin:10px 0!important;padding:12px 14px!important}
+.dp082-staff-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.dp082-staff-head h3{font-size:14px;line-height:1.2;margin:0;color:var(--text)}
+.dp082-staff-head p{font-size:10.5px;margin:3px 0 0;color:var(--muted)}
+.dp082-staff-counts{display:flex;flex-wrap:wrap;gap:5px;font-size:10px;font-weight:850}
+.dp082-staff-counts span{background:#f1f5f7;border:1px solid #e4eaef;border-radius:5px;padding:4px 7px}
+.dp082-staff-counts .dp082-attention{color:#a34427;background:#fff3ed;border-color:#efcdbf}
+.dp082-staff-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:9px}
+.dp082-staff-list{min-width:0}
+.dp082-list-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin-bottom:6px;font-size:11.5px}
+.dp082-list-title span{font-size:10px;color:var(--muted)}
+.dp082-chip-flow{display:flex;align-items:flex-start;gap:5px;flex-wrap:wrap;max-height:116px;overflow-y:auto}
+.dp082-need,.dp082-person-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #e3e9ed;border-radius:6px;background:#f7f9fa;padding:4px 7px;font-size:10.5px;max-width:100%}
+.dp082-need{border-color:#f0d9ca;background:#fffaf6}
+.dp082-need>span{display:flex;flex-direction:column;gap:0}
+.dp082-need small,.dp082-person-chip small{font-size:9px;color:#657780;font-weight:500;white-space:normal}
+.dp082-need .btn{font-size:9px!important;padding:3px 5px!important;line-height:1.1!important;min-height:auto!important}
+.dp082-person-chip{flex-direction:column;align-items:flex-start;gap:0}
+.dp082-person-chip.off{background:#eef6fa;border-color:#d7e7f0}
+.dp082-person-chip.planned{background:#f7f8fc;border-color:#e0e4f1}
+.dp082-person-chip.conflict{background:#fff0ed;border-color:#efc4bb}
+.dp082-okay{font-size:10.5px;color:#54776a}
+.dp082-staff-warning,.dp082-schedule-notice,.dp082-schedule-conflict{font-size:10.5px;border-top:1px dashed #e6ebef;margin-top:8px;padding-top:7px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.dp082-staff-warning,.dp082-schedule-conflict{color:#a54c34}
+@media(max-width:760px){.dp082-staff-grid{grid-template-columns:1fr;gap:10px}.dp082-chip-flow{max-height:148px}.dp082-staffing{padding:10px!important}.dp078-head .dp078-legend{justify-content:flex-start}}
+</style>
+</head>
 <body>
 <div class="app">
 <aside class="sidebar" id="sidebar">
 <div class="brand"><small>PJ Fitzpatrick</small><strong>Bath Manager</strong><span>Operating Dashboard</span></div>
 <nav class="nav" id="nav"></nav>
-<div class="sidebar-foot"><b>Local-first build • v0.81 (Compact Views)</b><br/>Data saves in this browser. Use Audit → Backup before moving devices.</div>
+<div class="sidebar-foot"><b>Local-first build • v0.82 (Compact Views)</b><br/>Data saves in this browser. Use Audit → Backup before moving devices.</div>
 </aside>
 <main class="main">
 <header class="topbar">
@@ -3098,7 +3139,7 @@ function importMtdRevenue(book,importId,fileName='MTD Revenue'){
  state.mtdCoverage={importId,fileName,rangeStart:filterRange.start||'',rangeEnd:filterRange.end||through||'',rowLatestDate:through||'',hasJobStatus:statusI>=0,hasSoldDate:soldDateI>=0,importedAt:new Date().toISOString()};
  state.mtdReconciliations.unshift({id:uid('mtd'),importId,fileName,importedAt:new Date().toISOString(),matched,created,confirmed,netChangeOrder:netCO,updates});
  for(const d of Object.keys(state.closeDayValidation||{})){if(mtdCloseDayCheck(d).ok)delete state.closeDayValidation[d]}
- rebuildCapacityCrewHistory();
+ rebuildCapacityCrewHistory();rebuildWBRData();
  audit('MTD completed revenue reconciled',fileName,`${readRows} completed rows • coverage ${state.mtdCoverage.rangeStart||'—'} through ${state.mtdCoverage.rangeEnd||through||'—'} • ${created} MTD-only jobs created • ${confirmed} closeout-confirmed • ${money(netCO)} net change orders`);return state.mtdCoverage.rangeEnd||through||asOf();
 }
 function mtdDailyTotal(date){return (state.mtdDailyTotals||[]).find(x=>x.date===date)||null}
@@ -3289,7 +3330,7 @@ function rebuildWBRData(){
  const statusRows=wf.filter(o=>isPHLBathBusinessUnit(workflowValue(o,[/^business unit$/i]))),monthWf=statusRows.filter(o=>{const d=parseDateCell(workflowValue(o,[/^last appt date$/i,/last appointment date/i]));return d&&d.startsWith(month)});
  const amountBy=(rows,re)=>rows.reduce((a,o)=>re.test(String(workflowValue(o,[/^job status$/i])||''))?a+toNumber(workflowValue(o,[/^jobs total$/i,/^job total$/i])):a,0);
  const backlog={};for(const o of statusRows){const st=String(workflowValue(o,[/^job status$/i])||'Unknown').trim()||'Unknown';backlog[st]=(backlog[st]||0)+toNumber(workflowValue(o,[/^jobs total$/i,/^job total$/i]))}
- state.wbrData={current:{'As Of':ref,'WTD Confirmed':sum(weekRows,'bathConfirmed'),'WTD Completed':sum(weekRows,'bathCompleted'),'MTD Confirmed':sum(monthRows,'bathConfirmed'),'MTD Completed':sum(monthRows,'bathCompleted'),'MTD Start':amountBy(monthWf,/^Start$/i),'MTD Scheduled':amountBy(monthWf,/^Scheduled$/i),'MTD Ordered':amountBy(monthWf,/^Ordered$|^Ordered - Awaiting ETA$/i)},backlog:Object.entries(backlog).map(([Status,Amount])=>({Status,Amount})).sort((a,b)=>b.Amount-a.Amount),updatedAt:new Date().toISOString()};
+ state.wbrData={current:{'As Of':ref,'WTD Confirmed':sum(weekRows,'bathConfirmed'),'WTD Completed':sum(weekRows,'bathCompleted'),'MTD Confirmed':sum(monthRows,'bathConfirmed'),'MTD Completed':wbrMtdCompletedFor(ref),'MTD Start':amountBy(monthWf,/^Start$/i),'MTD Scheduled':amountBy(monthWf,/^Scheduled$/i),'MTD Ordered':amountBy(monthWf,/^Ordered$|^Ordered - Awaiting ETA$/i)},backlog:Object.entries(backlog).map(([Status,Amount])=>({Status,Amount})).sort((a,b)=>b.Amount-a.Amount),updatedAt:new Date().toISOString()};
 }
 function findVocabularyHeader(sheet,vocabulary,minMatches=2){
  for(let i=0;i<Math.min(sheet.rows?.length||0,40);i++){const row=(sheet.rows[i]||[]).map(x=>String(x??'').trim());let hits=0;for(const c of row)if(vocabulary.some(v=>String(c).toLowerCase()===v.toLowerCase()))hits++;if(hits>=minMatches)return{row:i,headers:row}}
@@ -3608,21 +3649,28 @@ function daily073EmployeeCoverage(date){
   else missing.push(item);
  }
  const hasJobSource=daily.length>0||visits.length>0||workflowJobs>0||savedOnly.size>0;
- return{missing,unposted,planned,offAssigned,eligible:eligible.length,off:off.size,recorded:assigned.size,dailyJobs:daily.length,visits:visits.length,hasJobSource};
+ const offPeople=[...off.entries()].filter(([name])=>!assigned.has(name)).map(([name,reason])=>({name,reason})).sort((a,b)=>a.name.localeCompare(b.name));
+ const otherWorkPeople=[...otherWork.entries()].filter(([name])=>!assigned.has(name)&&!off.has(name)).map(([name,activity])=>({name,activity})).sort((a,b)=>a.name.localeCompare(b.name));
+ return{missing,unposted,planned,offAssigned,offPeople,otherWorkPeople,eligible:eligible.length,off:off.size,recorded:assigned.size,dailyJobs:daily.length,visits:visits.length,hasJobSource};
 }
 function daily073EmployeeCoverageHtml(date){
  if(!schedulerDayAllowed(date))return '';
  const c=daily073EmployeeCoverage(date),count=c.missing.length,other=c.unposted.length+c.planned.length;
- const button=(name)=>`<button class="btn small" data-daily073-add="${esc(name)}" title="Add a warranty, OOM, training or shop assignment">+ Add job</button>`;
- const item=(x)=>`<div class="dp073-employee"><div><strong>${esc(x.name)}</strong><small>${esc(x.role)}${x.detail?' · '+esc(x.detail):''}</small></div>${button(x.name)}</div>`;
- const status=!c.hasJobSource?'Upload schedule':count?'Review assignments':other?'Review unposted work':'All accounted for';
- return `<section class="card dp073-coverage" aria-label="Employee scheduling coverage" id="daily073Coverage"><div class="dp073-heading"><div><div class="card-title">Employee Scheduling Check</div><p>Active Bath installers with no recorded job or confirmed time off for ${esc(shortDate(date))}.</p></div><span class="status ${!c.hasJobSource||count?'warn':other?'info':'good'}">${esc(status)}</span></div>
- <div class="dp073-counts"><span><b>${c.eligible}</b> active installers</span><span><b>${c.recorded}</b> assigned on Daily Production</span><span><b>${c.off}</b> recorded off</span><span class="${c.hasJobSource&&count?'dp073-accent':''}"><b>${c.hasJobSource?count:'—'}</b> no assignment</span></div>
- ${!c.hasJobSource?'<div class="alert warn">No production or operational schedule has been recorded for this date. Upload the latest Workflow report or add jobs before relying on the unassigned list.</div>':''}
- ${c.hasJobSource&&count?`<details class="dp073-details" ${count<=6?'open':''}><summary><b>${count} employee${count===1?'':'s'} not scheduled and not off</b> — check for missed Warranty, OOM, Training or Shop assignments</summary><div class="dp073-grid">${c.missing.map(item).join('')}</div></details>`:c.hasJobSource?'<p class="dp073-clear">No active installers are missing from the known assignment and time-off records.</p>':''}
- ${other?`<details class="dp073-details"><summary>${other} assignment${other===1?'':'s'} not yet reflected on Daily Production</summary><p class="dp073-help">These employees appear in Workflow or a saved scheduler plan, but not on the Daily Production board. Verify and sync the assignments instead of creating duplicate jobs.</p><div class="dp073-grid">${[...c.unposted,...c.planned].map(item).join('')}</div></details>`:''}
- ${c.offAssigned.length?`<details class="dp073-details"><summary><span style="color:var(--bad)">${c.offAssigned.length} employee${c.offAssigned.length===1?'':'s'} assigned despite a time-off record</span></summary><div class="dp073-grid">${c.offAssigned.map(x=>`<div class="dp073-employee"><div><strong>${esc(x.name)}</strong><small>${esc(x.reason)} · ${esc(x.assignment)}</small></div></div>`).join('')}</div></details>`:''}
- <p class="dp073-help">Uses the Employee Manager roster, actual Daily Production crew, operational jobs, recent Workflow and recorded Employee Activity/Timesheet absences. Future leave may be unknown until reported. This is an in-dashboard warning, not a phone notification; no capacity is deducted automatically.</p></section>`;
+ const badge=(label,sub='',cls='')=>`<span class="dp082-person-chip ${cls}" title="${esc(sub)}"><b>${esc(label)}</b>${sub?`<small>${esc(sub)}</small>`:''}</span>`;
+ const missing=c.missing.map(e=>`<span class="dp082-need"><span><b>${esc(e.name)}</b><small>${esc(e.role)}</small></span><button class="btn small" type="button" data-daily073-add="${esc(e.name)}" title="Add an operational job for ${esc(e.name)}">+ Job</button></span>`).join('');
+ const sourceReady=c.hasJobSource;
+ const extra=[...c.unposted,...c.planned];
+ return `<section class="dp082-staffing card" id="daily073Coverage" aria-label="Employee scheduling check">
+ <div class="dp082-staff-head"><div><h3>Employee Scheduling Check</h3><p>Visible assignments and known absences · ${esc(shortDate(date))}</p></div><div class="dp082-staff-counts"><span>${c.eligible} active</span><span>${c.recorded} assigned</span><span>${c.offPeople.length} off</span><span class="${sourceReady&&count?'dp082-attention':''}">${sourceReady?count:'—'} unassigned</span></div></div>
+ ${!sourceReady?'<div class="dp082-staff-warning">No schedule source for this date. Upload Workflow or enter assignments before treating this as a complete list.</div>':''}
+ <div class="dp082-staff-grid">
+ <div class="dp082-staff-list"><div class="dp082-list-title"><b>Not assigned · ${sourceReady?count:'unverified'}</b><span>Not scheduled or recorded off</span></div><div class="dp082-chip-flow">${sourceReady?(missing||'<span class="dp082-okay">Everyone accounted for</span>'):'<span class="dp082-okay">Awaiting schedule evidence</span>'}</div></div>
+ <div class="dp082-staff-list"><div class="dp082-list-title"><b>Off · ${c.offPeople.length}</b><span>PTO / FMLA / PFML / sick / callouts</span></div><div class="dp082-chip-flow">${c.offPeople.map(e=>badge(e.name,e.reason,'off')).join('')||'<span class="dp082-okay">No confirmed absences</span>'}</div></div>
+ </div>
+ ${other?`<div class="dp082-schedule-notice"><strong>${other} jobs or plans needing verification:</strong> ${extra.map(e=>badge(e.name,e.detail,'planned')).join('')}</div>`:''}
+ ${c.otherWorkPeople.length?`<div class="dp082-schedule-notice"><strong>Other recorded activity:</strong> ${c.otherWorkPeople.map(e=>badge(e.name,e.activity,'planned')).join('')}</div>`:''}
+ ${c.offAssigned.length?`<div class="dp082-schedule-conflict"><strong>${c.offAssigned.length} assigned despite recorded time off:</strong> ${c.offAssigned.map(e=>badge(e.name,`${e.reason} · ${e.assignment}`,'conflict')).join('')}</div>`:''}
+ </section>`;
 }
 function productionProtectedDayHtml(date,jobs){
  if(!productionDayStarted(date))return '';
@@ -3801,6 +3849,27 @@ function dp078Row(j){
   <td><button type="button" class="btn small dp078-action" data-dp077-update="${esc(j.id)}">Update</button></td>
  </tr>`;
 }
+// Capacity indicator uses the same engine as the Capacity tab, never a separate estimate.
+function dailyBoardOpeningsBadge(date){
+ const row=date>=todayISO()&&schedulerDayAllowed(date)?futureCapacityRowForDate(date):null;
+ const valid=!!row?.valid;
+ const openings=valid?Math.max(0,Number(row.openSlots)||0):null;
+ const label=valid?`${openings} opening${openings===1?'':'s'}`:date<todayISO()?'Past day · Capacity':'Openings unavailable';
+ const tone=!valid?'unknown':openings?'has-openings':'full';
+ const title=valid?`${row.confirmed?'Manager-confirmed':'Estimated'} · see Capacity tab for crew and assignment breakdown`:'Open Capacity tab to review source coverage and crew details';
+ return `<button type="button" id="dailyOpenCapacity" class="dp082-capacity-badge ${tone}" title="${esc(title)}" aria-label="${esc(label)} — open Capacity tab">${esc(label)}</button>`;
+}
+function dp082OperationalRow(v){
+ const type=otherJobCategory(v),crew=warrantyAssigneeNames(v),notes=String(v.notes||'').trim();
+ return `<tr class="dp082-operational-row">
+ <td><strong class="dp078-job">#${esc(v.jobNumber||'—')}</strong><div class="dp078-minor">${esc(type)}</div></td>
+ <td><b class="dp078-customer">${esc(type==='Warranty'?v.type:type)}</b>${notes?`<div class="dp078-minor" title="${esc(notes)}">${esc(notes.length>65?notes.slice(0,65)+'…':notes)}</div>`:''}</td>
+ <td class="dp078-crew">${crew.length?crew.map(name=>`<div class="dp082-person">${esc(name)}</div>`).join(''):'<span class="dp082-unassigned">Not assigned</span>'}</td>
+ <td class="dp078-statuscell"><span class="dp082-kind">${esc(type)}</span><div class="dp078-tags"><span class="dp082-cap-tag ${v.usesCapacity?'yes':'no'}">${v.usesCapacity?'Uses capacity':'No capacity used'}</span></div></td>
+ <td class="dp078-money muted">—</td><td class="dp078-money muted">—</td><td class="dp078-money muted">—</td>
+ <td><button type="button" class="btn small" data-wty-edit="${esc(v.id)}" aria-label="Edit ${esc(type)} job ${esc(v.jobNumber||'')}">Edit</button></td>
+ </tr>`;
+}
 function dp078Table(jobs){
  const active=jobs.filter(j=>j.status!=='Deleted');
  const open=active.filter(j=>dp078Stage(j)==='open').sort((a,b)=>{
@@ -3810,14 +3879,16 @@ function dp078Table(jobs){
  const breaks=active.filter(j=>dp078Stage(j)==='breakage');
  const finished=active.filter(j=>dp078Stage(j)==='finished');
  const revenue=breaks.filter(j=>!productionIsNonRevenueVisit(j)).reduce((n,j)=>n+Number(j.confirmedTotal||0),0);
+ const operational=warrantyVisitsOn(dailyDate);
  const sections=[
-  {title:'Open Jobs',note:'Unfinished work first',rows:open,cls:'open'},
+  {title:'Open Jobs',note:'Unfinished installations first',rows:open,cls:'open'},
+  {title:'Other Jobs',note:`${operational.length} Warranty / OOM / Training / Shop assignments · no install revenue`,rows:operational,cls:'other'},
   {title:'Breakage',note:`${breaks.length} unsuccessful · ${money(revenue)} not completed`,rows:breaks,cls:'breakage'},
   {title:'Completed',note:'Finished jobs moved to the bottom',rows:finished,cls:'done'}
  ];
- return `<section class="dp078-wrap" aria-label="Daily Production row board"><div class="dp078-head"><div><h2>Daily Job Board</h2><p>Unfinished jobs first · one Update button per row · amounts kept separate</p></div><div class="dp078-legend"><span class="two">2-day</span><span class="cali">Cali door</span><span class="break">Breakage</span><span class="done">Completed</span></div></div>
+ return `<section class="dp078-wrap" aria-label="Daily Production row board"><div class="dp078-head"><div><h2>Daily Job Board</h2><p>Installations and all other assigned jobs · completed installs last</p></div><div class="dp078-legend">${dailyBoardOpeningsBadge(dailyDate)}<span class="two">2-day</span><span class="cali">Cali door</span><span class="break">Breakage</span><span class="done">Completed</span></div></div>
  <div class="dp078-scroll"><table class="dp078-table"><thead><tr><th>Job #</th><th>Customer / Town</th><th>Assigned crew</th><th>Status / Flags</th><th>Original confirmed</th><th>Completed · MTD</th><th>Change order Δ</th><th></th></tr></thead><tbody>
- ${sections.map(s=>`<tr class="dp078-group dp078-group-${s.cls}"><td colspan="8"><b>${s.title} <span>${s.rows.length}</span></b><small>${s.note}</small></td></tr>${s.rows.map(dp078Row).join('')}${s.rows.length?'':`<tr class="dp078-empty"><td colspan="8">No ${s.title.toLowerCase()} jobs</td></tr>`}`).join('')}
+ ${sections.filter(s=>s.rows.length).map(s=>`<tr class="dp078-group dp078-group-${s.cls}"><td colspan="8"><b>${s.title} <span>${s.rows.length}</span></b><small>${s.note}</small></td></tr>${s.rows.map(s.cls==='other'?dp082OperationalRow:dp078Row).join('')}`).join('')||'<tr class="dp078-empty"><td colspan="8">No installation or other jobs are recorded for this date.</td></tr>'}
  </tbody></table></div><p class="dp078-foot">Confirmed is the originally booked amount. Completed comes only from MTD after installation completion. Change order shows the difference only when MTD confirms a different total. Breakage is excluded from completed revenue.</p></section>`;
 }
 
@@ -3835,11 +3906,9 @@ function renderDaily(){
  ${jobs.some(j=>productionHasTrackedIssue(j)||productionHasBreakage(j))?productionIssueStrip(jobs):''}
  ${mtdSupported&&stats.needsConfirmation?`<div class="alert bad"><b>${stats.needsConfirmation} completed job(s) need MTD confirmation.</b> Check the job status and uploaded report.</div>`:''}
  ${dp078Table(jobs)}
- <details class="ui081-fold dp081-secondary" id="dp081Operations"><summary>Operational visits · staffing · capacity <span>${(state.warrantyVisits||[]).filter(v=>v.date===dailyDate).length} operational visits · staffing, memo holds & protection ▾</span></summary><div class="ui081-fold-body">
- ${warrantyDayHtml(dailyDate)}
- ${productionProtectedDayHtml(dailyDate,jobs)}
  ${daily073EmployeeCoverageHtml(dailyDate)}
- ${dailyCapacityCard()}
+ <details class="ui081-fold dp081-secondary" id="dp081Operations"><summary>Advanced operational details <span>Memo holds, protected workdays & closeout progress ▾</span></summary><div class="ui081-fold-body">
+ ${productionProtectedDayHtml(dailyDate,jobs)}
  ${memoCapacityReviewHtml(dailyDate)}
  ${productionCloseoutProgress(jobs)}
  <div class="ui081-inline"><div><b>Quick-fill opportunities</b><span>Stock Check: ${qf.supported?qf.stock:'—'} · Materials Ready: ${qf.supported?qf.materials:'—'}</span></div><button class="btn small" data-go="scheduling">Advanced Scheduling</button></div>
@@ -3848,7 +3917,7 @@ function renderDaily(){
  ${productionIssueTrackerHtml()}
  ${!mtdSupported&&!closeBlocked?`<div class="alert info" style="margin-top:12px"><b>MTD is due at Close Day.</b> Upload the report with Completion Date / Job Status before final closeout.</div>`:''}
  </div></details>`;
- el.querySelectorAll('[data-dp077-update]').forEach(x=>x.onclick=()=>dp077OpenUpdate(x.dataset.dp077Update));$('#prodDate').onchange=e=>{dailyDate=e.target.value;renderDaily()};$('#dailyOpenCapacity').onclick=()=>navigate('capacity');$('#addProdJob').onclick=()=>openJobModal();$('#addWarranty').onclick=()=>openWarrantyModal();$('#wtAddInSection').onclick=()=>openWarrantyModal();el.querySelectorAll('[data-wty-edit]').forEach(b=>b.onclick=()=>openWarrantyModal(b.dataset.wtyEdit));$('#emptyAddProd')&&($('#emptyAddProd').onclick=()=>openJobModal());$('#closeDay').onclick=()=>closeProductionDay(dailyDate);$('#uploadMtd').onclick=()=>$('#dailyMtdPicker').click();$('#dailyMtdPicker').onchange=e=>{if(e.target.files?.length)processFiles([...e.target.files])};el.querySelectorAll('[data-job-edit]').forEach(b=>b.onclick=()=>openJobModal(b.dataset.jobEdit));el.querySelectorAll('[data-job-closeout]').forEach(b=>b.onclick=()=>openCloseoutModal(b.dataset.jobCloseout));initProductionIssueTracker();
+ el.querySelectorAll('[data-dp077-update]').forEach(x=>x.onclick=()=>dp077OpenUpdate(x.dataset.dp077Update));$('#prodDate').onchange=e=>{dailyDate=e.target.value;renderDaily()};$('#dailyOpenCapacity')?.addEventListener('click',()=>navigate('capacity'));$('#addProdJob').onclick=()=>openJobModal();$('#addWarranty').onclick=()=>openWarrantyModal();$('#wtAddInSection')?.addEventListener('click',()=>openWarrantyModal());el.querySelectorAll('[data-wty-edit]').forEach(b=>b.onclick=()=>openWarrantyModal(b.dataset.wtyEdit));$('#emptyAddProd')&&($('#emptyAddProd').onclick=()=>openJobModal());$('#closeDay').onclick=()=>closeProductionDay(dailyDate);$('#uploadMtd').onclick=()=>$('#dailyMtdPicker').click();$('#dailyMtdPicker').onchange=e=>{if(e.target.files?.length)processFiles([...e.target.files])};el.querySelectorAll('[data-job-edit]').forEach(b=>b.onclick=()=>openJobModal(b.dataset.jobEdit));el.querySelectorAll('[data-job-closeout]').forEach(b=>b.onclick=()=>openCloseoutModal(b.dataset.jobCloseout));initProductionIssueTracker();
  el.querySelectorAll('[data-daily073-add]').forEach(b=>b.onclick=()=>openWarrantyModal('',dailyDate,b.dataset.daily073Add));
 }
 
@@ -4652,14 +4721,15 @@ function wbrIsTentative(row){
 }
 function wbrPacingSeries(c){
  const days=wbrWorkdaysBetween(monthStartISO(c.ref),monthEndISO(c.ref));
- const source=wbrRegionalRows(monthStartISO(c.ref),c.ref).sort((a,b)=>a.date.localeCompare(b.date));
+ const source=wbrMtdCompletedFor(c.ref)==null?[]:(state.mtdDailyTotals||[]).filter(r=>r.date>=monthStartISO(c.ref)&&r.date<=c.ref).sort((a,b)=>a.date.localeCompare(b.date));
  const actual=[];let rolling=0,at=0;
  for(const d of days){
-  if(d>c.ref){actual.push(null);continue;}
-  while(at<source.length&&source[at].date<=d){rolling+=Number(source[at].bathCompleted||0);at++;}
+  if(d>c.ref||(state.mtdCoverage?.rangeEnd&&d>state.mtdCoverage.rangeEnd)){actual.push(null);continue;}
+  while(at<source.length&&source[at].date<=d){rolling+=Number(source[at].completedRevenue||0);at++;}
   actual.push(source.length&&d>=source[0].date?rolling:null);
  }
- const cutoff=days.filter(d=>d<=c.ref).length-1;
+ const mtdThrough=state.mtdCoverage?.rangeEnd&&state.mtdCoverage.rangeEnd<c.ref?state.mtdCoverage.rangeEnd:c.ref;
+ const cutoff=days.filter(d=>d<=mtdThrough).length-1;
  const last=actual.slice(0,Math.max(0,cutoff+1)).filter(x=>x!=null).at(-1);
  const potential=days.map((d,i)=>{
   if(last==null||c.forecast==null)return null;
@@ -4714,11 +4784,34 @@ function wbrOldestQueueJobs(rows,referenceDate){
 }
 function wbrRegionalRows(start,end){return [...new Map((state.regionalTrackerRows||[]).filter(r=>r.date>=start&&r.date<=end).map(r=>[r.date,r])).values()]}
 function wbrRegionalTotal(start,end,key){const a=wbrRegionalRows(start,end);return a.length?a.reduce((s,r)=>s+Number(r[key]||0),0):null}
+// v0.82: Completed MTD is an MTD report value, not a Regional Tracker subtotal.
+// Never substitute a Regional Tracker value if this source is missing, from the
+// wrong month, or has a known partial-month starting boundary.
+function wbrMtdCompletedFor(ref){
+ const last=latestImport('mtd-revenue'),coverage=state.mtdCoverage||{},start=monthStartISO(ref),rows=state.mtdDailyTotals||[];
+ if(!last||last.status!=='Imported'||!rows.length)return null;
+ if(coverage.rangeStart&&coverage.rangeStart>start)return null;
+ if(coverage.rangeEnd&&coverage.rangeEnd<start)return null;
+ const current=rows.filter(x=>x.date>=start&&x.date<=ref);
+ if(!current.length)return null;
+ return current.reduce((total,r)=>total+Number(r.completedRevenue||0),0);
+}
+function wbrMtdHasMonthCoverage(ref){
+ const last=latestImport('mtd-revenue'),c=state.mtdCoverage||{},start=monthStartISO(ref);
+ return !!(last?.status==='Imported'&&c.rangeStart&&c.rangeStart<=start&&c.rangeEnd&&c.rangeEnd>=ref);
+}
+function wbrMtdRevenueSourceLabel(ref){
+ const last=latestImport('mtd-revenue'),c=state.mtdCoverage||{};
+ if(wbrMtdCompletedFor(ref)==null)return 'MTD report not available for the selected reporting month';
+ const through=c.rangeEnd&&c.rangeEnd<ref?c.rangeEnd:ref;
+ return `ServiceTitan MTD • through ${fmtDate(through)}${c.rangeStart&&c.rangeStart>monthStartISO(ref)?' • partial month':''}`;
+}
+
 function wbrCapacity(start,end){const days=workingDaysBetween(start,end);const hist=new Map();for(const m of new Set(days.map(x=>x.slice(0,7))))for(const r of historicalCapacityMonthRows(m+'-01'))hist.set(r.date,r);const ctx=futureCapacityContext();const rows=days.map(d=>d<asOf()?hist.get(d)||{date:d,valid:false}:futureCapacityRowForDate(d,ctx));const q=capacityPeriodSummary(rows);return{available:days.length&&q.missing===0?q.available:null,filled:days.length&&q.missing===0?q.available-q.open:null,valid:q.verified,total:q.days,estimated:rows.some(r=>r.valid&&r.date>=asOf()&&!r.confirmed)}}
 function wbrInstallation(start,end,reportRef){const actualEnd=end<reportRef?end:reportRef;const records=(state.productionJobs||[]).filter(j=>j.date>=start&&j.date<=actualEnd&&j.status!=='Deleted'&&j.status!=='OOM'&&(!j.businessUnit||isPHLBathBusinessUnit(j.businessUnit)));const morning=[...new Map(records.filter(j=>!j.mtdOnly).map(j=>[String(j.jobNumber),j])).values()];const done=[...new Map(records.filter(j=>COMPLETED_STATUSES.has(j.status)||j.mtdReconciledAt).map(j=>[String(j.jobNumber),j])).values()];const br=[...new Map(records.filter(j=>BREAKAGE_STATUSES.has(j.status)).map(j=>[String(j.jobNumber),j])).values()];const type=j=>{const t=String(j.tagsRaw||j.tags||'');if(/unscheduled\s*2\s*day/i.test(t)||j.status==='Breakage/U2Day')return'one';if(/(?:^|[,;|])\s*(?:2\s*day|tier\s*3|two\s*day)\s*(?:$|[,;|])/i.test(t)||['2 Day - Day 1 Complete','2 Day Complete'].includes(j.status))return'two';if(/tier\s*[12]/i.test(t)||['Complete 2in1','Complete','Cali Day 1','Cali Complete'].includes(j.status))return'one';return'unknown'};const one=morning.filter(j=>type(j)==='one');const completedOne=one.filter(j=>done.some(k=>String(k.jobNumber)===String(j.jobNumber))&&!br.some(k=>String(k.jobNumber)===String(j.jobNumber)));const coverage=workingDaysBetween(start,actualEnd), days=new Set(records.filter(j=>!j.workflowManaged||j.closed||j.mtdReconciledAt||COMPLETED_STATUSES.has(j.status)||BREAKAGE_STATUSES.has(j.status)).map(j=>j.date));const supported=coverage.length>0&&coverage.every(d=>days.has(d));const classified=morning.length>0&&morning.every(j=>type(j)!=='unknown');return{done:supported?done.length:null,scheduledOne:supported&&classified?one.length:null,completeOne:supported&&classified?completedOne.length:null,scheduledTotal:supported?morning.length:null,breakageJobs:supported?br.length:null,breakageRevenue:supported?br.reduce((sum,j)=>sum+Number(j.confirmedTotal||0),0):null,coverage:coverage.length?`${coverage.filter(d=>days.has(d)).length}/${coverage.length} working days with production evidence`:'No elapsed workdays',estimated:true}}
 function wbrMetrics(ref,withWorkflow=true){
  const cfg=wbrConfig(),month=ref.slice(0,7),start=monthStartISO(ref),end=monthEndISO(ref),ws=wbrWeekStart(ref),we=addDaysISO(ws,6),form=cfg.weeks[ws]||{},goal=wbrMonthGoal(month),days=wbrWorkdaysBetween(start,end),elapsed=days.filter(d=>d<=ref).length,weekDays=wbrWorkdaysBetween(ws,we),monthWeekDays=weekDays.filter(d=>d>=start&&d<=end).length;
- const confirmed=wbrRegionalTotal(ws,we,'bathConfirmed'),completed=wbrRegionalTotal(ws,ref,'bathCompleted'),mtd=wbrRegionalTotal(start,ref,'bathCompleted'),mtdConfirmed=wbrRegionalTotal(start,ref,'bathConfirmed');
+ const confirmed=wbrRegionalTotal(ws,we,'bathConfirmed'),completed=wbrRegionalTotal(ws,ref,'bathCompleted'),mtd=wbrMtdCompletedFor(ref),mtdConfirmed=wbrRegionalTotal(start,ref,'bathConfirmed');
  const weekGoal=wbrOverride(form.weekGoal,goal!=null&&days.length&&monthWeekDays===weekDays.length?goal/days.length*weekDays.length:null),weekElapsed=weekDays.filter(d=>d<=ref).length;
  const rows=withWorkflow?wbrWorkflowRows():[],hasWorkflow=withWorkflow&&(state.workflowRows||[]).length>0;
  const monthRows=rows.filter(r=>String(parseDateCell(workflowValue(r,[/^last appt date$/i,/last appointment date/i]))||'').startsWith(month));const amount=re=>hasWorkflow?monthRows.filter(r=>re.test(wbrWorkflowStatus(r))).reduce((s,r)=>s+wbrWorkflowAmount(r),0):null;
@@ -4757,7 +4850,7 @@ function wbrInsightCandidates(c,p){
  const reqWeek=workingDaysBetween(c.ws,c.ref).length;
  const validWeek=reqWeek>0&&wbrRegionalRows(c.ws,c.ref).length>=reqWeek;
  const reqMonth=workingDaysBetween(monthStartISO(c.ref),c.ref).length;
- const validMonth=reqMonth>0&&wbrRegionalRows(monthStartISO(c.ref),c.ref).length>=reqMonth;
+ const validMonth=reqMonth>0&&wbrMtdHasMonthCoverage(c.ref);
  const lastStart=addDaysISO(c.ws,-7),lastThrough=addDaysISO(c.ref,-7);
  const prevWeekCovered=workingDaysBetween(lastStart,lastThrough).length>0&&wbrRegionalRows(lastStart,lastThrough).length>=workingDaysBetween(lastStart,lastThrough).length;
  const comparable=validWeek&&prevWeekCovered;
@@ -5076,6 +5169,7 @@ function renderWBR(){
  if(c.goal==null)needs.push('Bath monthly goal');
  if(!rt)needs.push('Regional Tracker');
  if(!wf)needs.push('Production Workflow');
+  if(c.mtd==null)needs.push('MTD report covering the selected month');
  const notices=needs.length?`<div class="wbr-simple-alert"><strong>WBR inputs needed:</strong> ${esc(needs.join(' · '))}. ${c.goal==null?'Verify the Bath goal in the tracker or enter it manually. ':''}${!rt||!wf?'<button class="wbr-text-action" onclick="navigate(&quot;imports&quot;)">Open imports</button>':''}${c.goal==null?'<button class="wbr-text-action" onclick="openWBRInputs()">Edit goal</button>':''}</div>`:'';
  const slideExportNote=`<p class="wbr-footnote"><strong>WBR export formats (4 slides):</strong> Original graphics (.xlsx) retains all 8 Excel charts and their exact formatting. Editable WBR slides (.pptx) preserves the original two visual layouts and adds a Bath-only operating summary and a fourth native-editable working-day pacing chart (actual vs potential). Other departments remain zero placeholders on the two original-layout slides until their data is connected. For the original chart's exact appearance inside PowerPoint, paste the updated Excel chart as an <em>embedded Excel chart</em>, not a picture.</p>`;
  const monthlyCard=`<section class="card wbr-main-panel"><div class="wbr-panel-heading"><div><div class="wbr-overline">MONTHLY PERFORMANCE</div><h3>${new Date(c.month+'-15T12:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'})} progress</h3></div><span class="wbr-pace-tag ${c.pacePct==null?'neutral':c.pacePct>=1?'good':'warn'}">${paceLabel}</span></div><div class="wbr-main-progress" aria-label="${esc(progressText)}"><span style="width:${progress}%"></span></div><div class="wbr-between muted"><span>${esc(progressText)}</span><span>${c.elapsed} / ${c.workdays} workdays · ${c.workdaysRemaining} left</span></div><div class="wbr-quick-stats"><div><span>Needed per workday</span><strong>${c.remaining==null?'—':c.remaining<=0?'$0':c.workdaysRemaining>0?wbrFmt(c.remaining/c.workdaysRemaining):'—'}</strong><small>${c.workdaysRemaining} days left</small></div><div><span>Target to date</span><strong>${wbrFmt(c.paceTarget)}</strong></div><div><span>Actual vs pace</span><strong class="wbr-dynamic-pace ${c.paceTarget==null||c.mtd==null?'':c.mtd>=c.paceTarget?'positive':'negative'}">${wbrSignedMoney(wbrDiff(c.mtd,c.paceTarget))}</strong><small>${paceDetail}</small></div></div><div class="wbr-goal-delta-grid">${wbrGoalGapCard('Actual gap to monthly goal',c.mtd,c.goal,'Completed revenue minus full monthly goal')}${wbrGoalGapCard('Forecasted gap to monthly goal',c.forecast,c.goal,'Potential month-end revenue minus full monthly goal')}</div><div class="wbr-forecast-context"><div class="wbr-between"><span>Firmly booked <small>(no tentative jobs)</small></span><strong>${wbrFmt(c.booked)}</strong></div><div class="wbr-between"><span>Potential month-end total</span><strong>${wbrFmt(c.forecast)}</strong></div></div><p class="wbr-footnote">Forecast includes tentative and ordered jobs; it is potential revenue, not a completion guarantee.</p></section>`;
@@ -5087,9 +5181,9 @@ function renderWBR(){
  <details class="wbr-accordion"><summary><span>Breakage, capacity &amp; installation details</span><span class="wbr-chevron">⌄</span></summary><div class="wbr-accordion-inner wbr-detail-grid">${wbrCard('Breakage',wbrTable(breakRows,c,p)+`<p class="wbr-footnote">Breakage/U2Day and Breakage - RTO jobs; verify daily records or use manager inputs.</p>`)}${wbrCard('Capacity',wbrTable(cap,c,p)+`<p class="wbr-footnote">${esc(c.capacityNote)}. ${esc(FUTURE_CAPACITY_DISCLAIMER)}</p>`)}${wbrCard('Installation performance',wbrTable(install,c,p)+`<p class="wbr-footnote">${esc(c.installationNote)}</p>`,true)}</div></details>
  <details class="wbr-accordion"><summary><span>Full backlog, job statuses &amp; aging</span><span class="wbr-chevron">⌄</span></summary><div class="wbr-accordion-inner wbr-detail-grid">${wbrCard('Detailed Bath backlog',wbrBacklogHtml(c,p),true)}${wbrCard('Current status aging',wbrAgingHtml(c)+`<div class="wbr-footnote"><b>Verified cycle-time findings:</b> ${esc(c.cycleNotes||'Not entered')}</div>`,true)}</div></details>
  <details class="wbr-accordion"><summary><span>Assessments (postponed until 2027)</span><span class="wbr-chevron">⌄</span></summary><div class="wbr-accordion-inner"><div class="wbr-assessment"><b>Assessment:</b> ${esc(c.assessment||'Not entered')}<br><b>Score:</b> ${c.score==null?'—':num(c.score,2)+'%'} &nbsp; <b>Previous:</b> ${c.lastScore==null?'—':num(c.lastScore,2)+'%'}<br><b>Trends:</b> ${esc(c.trends||'Not entered')}<br><b>Actions:</b> ${esc(c.assessmentActions||'Not entered')}</div></div></details>
- <details class="wbr-accordion"><summary><span>Data sources, definitions &amp; quality checks ${issues.length?'('+issues.length+' notices)':''}</span><span class="wbr-chevron">⌄</span></summary><div class="wbr-accordion-inner"><div class="wbr-source-grid"><p><b>Reporting cutoff:</b> ${fmtDate(c.ref)}</p><p><b>Current week:</b> ${fmtDate(c.ws)} – ${fmtDate(c.we)}</p><p><b>Previous week:</b> ${fmtDate(p.ws)} – ${fmtDate(p.we)}</p><p><b>Comparison:</b> ${esc(prevInfo)}</p><p><b>Regional Tracker:</b> ${esc(rt?.fileName||'Not loaded')}</p><p><b>Monthly Bath goal:</b> ${esc(c.goalSource)} ${esc(wbrConfig().goalSourceNotes?.[c.month]||'')}</p><p><b>Goal import notices:</b> ${esc((wbrConfig().goalImportWarnings||[]).join('; ')||'None')}</p><p><b>Production Workflow:</b> ${esc(wf?.fileName||'Not loaded')}</p><p><b>Snapshot:</b> ${cfg.snapshots[c.ws]?'Saved; re-save after updates':'Not saved for current week'}</p><p><b>Default cutoff:</b> Monday uses the preceding Friday.</p></div>${dataConfidenceBanner(issues)}${slideExportNote}<p class="wbr-footnote">Confirmed and completed revenue use Bath Regional Tracker daily entries. Revenue pacing uses Monday–Friday, excluding New Year’s Day, Memorial Day, Independence Day, Labor Day, Thanksgiving Day and Christmas Day (observed dates). Saturday exceptions in crew capacity do not count as WBR workdays. Historical backlog comparisons require a saved prior-week snapshot. Workflow totals use all Bath Install jobs, not only the reporting month. Future capacity is an estimate, not a confirmed schedule.</p><button class="btn" type="button" onclick="setWBRReportingDate('')">Reset reporting cutoff</button> <button class="btn" type="button" onclick="navigate('imports')">View imports</button></div></details>
+ <details class="wbr-accordion"><summary><span>Data sources, definitions &amp; quality checks ${issues.length?'('+issues.length+' notices)':''}</span><span class="wbr-chevron">⌄</span></summary><div class="wbr-accordion-inner"><div class="wbr-source-grid"><p><b>Reporting cutoff:</b> ${fmtDate(c.ref)}</p><p><b>Current week:</b> ${fmtDate(c.ws)} – ${fmtDate(c.we)}</p><p><b>Previous week:</b> ${fmtDate(p.ws)} – ${fmtDate(p.we)}</p><p><b>Comparison:</b> ${esc(prevInfo)}</p><p><b>Regional Tracker (weekly revenue and monthly goal):</b> ${esc(rt?.fileName||'Not loaded')}</p><p><b>MTD Completed (ServiceTitan MTD):</b> ${esc(wbrMtdRevenueSourceLabel(c.ref))} · ${esc(latestImport('mtd-revenue')?.fileName||'Not loaded')}</p><p><b>Monthly Bath goal:</b> ${esc(c.goalSource)} ${esc(wbrConfig().goalSourceNotes?.[c.month]||'')}</p><p><b>Goal import notices:</b> ${esc((wbrConfig().goalImportWarnings||[]).join('; ')||'None')}</p><p><b>Production Workflow:</b> ${esc(wf?.fileName||'Not loaded')}</p><p><b>Snapshot:</b> ${cfg.snapshots[c.ws]?'Saved; re-save after updates':'Not saved for current week'}</p><p><b>Default cutoff:</b> Monday uses the preceding Friday.</p></div>${dataConfidenceBanner(issues)}${slideExportNote}<p class="wbr-footnote">Weekly confirmed/completed revenue uses Bath Regional Tracker daily entries; month-to-date completed revenue and the actual pace line use the ServiceTitan MTD report. Revenue pacing uses Monday–Friday, excluding New Year’s Day, Memorial Day, Independence Day, Labor Day, Thanksgiving Day and Christmas Day (observed dates). Saturday exceptions in crew capacity do not count as WBR workdays. Historical backlog comparisons require a saved prior-week snapshot. Workflow totals use all Bath Install jobs, not only the reporting month. Future capacity is an estimate, not a confirmed schedule.</p><button class="btn" type="button" onclick="setWBRReportingDate('')">Reset reporting cutoff</button> <button class="btn" type="button" onclick="navigate('imports')">View imports</button></div></details>
  </section>`;
- el.innerHTML=heading+`<div class="wbr-simple">${notices}<div class="wbr-simple-period">Review through <b>${fmtDate(c.ref)}</b> <span>·</span> Previous: ${fmtDate(p.ws)} – ${fmtDate(p.we)} ${p.savedAt?'(saved)':'(partial)'}</div><div class="wbr-simple-hero">${wbrSimpleMetric('Monthly goal',wbrFmt(c.goal),c.goalSource+' • Bath')}${wbrSimpleMetric('MTD completed',wbrFmt(c.mtd),c.goalComplete==null?'Actual completed revenue':`${pct(c.goalComplete,1)} of monthly goal`)}${wbrSimpleMetric('Weekly completed',wbrFmt(c.completed),c.goalPct==null?'Actual through cutoff':`${pct(c.goalPct,1)} of weekly goal`)}</div><div class="wbr-simple-panels">${monthlyCard}${weekCard}${backlogCard}${notesCard}</div>${wbr072WeeklyHtml(c.ref)}<section class="card wbr-pace-card"><div class="wbr-panel-heading"><div><div class="wbr-overline">WORKING-DAY TRENDS</div><h3>Actual vs potential pace to monthly goal</h3></div><span class="muted">Bath only · ${c.workdaysRemaining} workdays left</span></div>${wbrPaceChart(c)}<div class="wbr-pace-numbers"><span><b>Actual:</b> ${wbrFmt(c.mtd)}</span><span><b>Expected by today:</b> ${wbrFmt(c.paceTarget)}</span><span><b>Firmly booked:</b> ${wbrFmt(c.booked)}</span><span><b>Potential forecast:</b> ${wbrFmt(c.forecast)}</span></div></section>${detail}</div>`;
+ el.innerHTML=heading+`<div class="wbr-simple">${notices}<div class="wbr-simple-period">Review through <b>${fmtDate(c.ref)}</b> <span>·</span> Previous: ${fmtDate(p.ws)} – ${fmtDate(p.we)} ${p.savedAt?'(saved)':'(partial)'}</div><div class="wbr-simple-hero">${wbrSimpleMetric('Monthly goal',wbrFmt(c.goal),c.goalSource+' • Bath')}${wbrSimpleMetric('MTD completed · MTD report',wbrFmt(c.mtd),c.mtd==null?'Import current-month MTD for completed revenue':`${wbrMtdRevenueSourceLabel(c.ref)} · ${c.goalComplete==null?'Goal unavailable':pct(c.goalComplete,1)+' of monthly goal'}`)}${wbrSimpleMetric('Weekly completed',wbrFmt(c.completed),c.goalPct==null?'Actual through cutoff':`${pct(c.goalPct,1)} of weekly goal`)}</div><div class="wbr-simple-panels">${monthlyCard}${weekCard}${backlogCard}${notesCard}</div><section class="card wbr-pace-card"><div class="wbr-panel-heading"><div><div class="wbr-overline">WORKING-DAY TRENDS</div><h3>Actual vs potential pace to monthly goal</h3></div><span class="muted">Bath only · ${c.workdaysRemaining} workdays left</span></div>${wbrPaceChart(c)}<div class="wbr-pace-numbers"><span><b>Actual:</b> ${wbrFmt(c.mtd)}</span><span><b>Expected by today:</b> ${wbrFmt(c.paceTarget)}</span><span><b>Firmly booked:</b> ${wbrFmt(c.booked)}</span><span><b>Potential forecast:</b> ${wbrFmt(c.forecast)}</span></div></section>${detail}</div>`;
 }
 
 // Exact WBR Excel graphics template, provided by user. Intentionally retain all 8 native Excel charts.
