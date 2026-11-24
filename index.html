@@ -855,7 +855,7 @@ button{cursor:pointer}
 <aside class="sidebar" id="sidebar">
 <div class="brand"><small>PJ Fitzpatrick</small><strong>Bath Manager</strong><span>Operating Dashboard</span></div>
 <nav class="nav" id="nav"></nav>
-<div class="sidebar-foot"><b>Local-first build • v0.82 (Compact Views)</b><br/>Data saves in this browser. Use Audit → Backup before moving devices.</div>
+<div class="sidebar-foot"><b>Local-first build • v0.83 (Compact Views)</b><br/>Data saves in this browser. Use Audit → Backup before moving devices.</div>
 </aside>
 <main class="main">
 <header class="topbar">
@@ -1494,7 +1494,11 @@ function upsertPayrollCallout(emp,row){
  return true;
 }
 function refreshPayrollLeaveLinks(){
- state.availabilityEvents=(state.availabilityEvents||[]).filter(x=>x.sourceType!=='ServiceTitan Payroll');
+ const today=todayISO();
+ state.availabilityEvents=(state.availabilityEvents||[]).filter(x=>x.sourceType!=='ServiceTitan Payroll'||x.startDate<=today);
+ // A removed ServiceTitan memo also removes the future auto-imported callout,
+ // but never a manually entered manager callout or historical attendance.
+ state.callouts=(state.callouts||[]).filter(c=>!(c.autoImported&&c.source==='ServiceTitan Timesheet'&&c.date>today));
  state.reviewQueue=(state.reviewQueue||[]).filter(q=>!['Unmatched Attendance Leave Employee','Attendance Leave / Working Conflict','Potential Call Out'].includes(q?.type));
  let leaveRecords=0,unmatched=0,calloutsAdded=0;
  const availability=[];
@@ -1559,11 +1563,21 @@ function availabilityCounts(ref){
  const raw=workforceForDate(ref,new Set());
  return{total:details.length,lead,support,other,details,leadNames,supportNames,rosterLeads:raw.leads.length,rosterSupport:raw.supports.length};
 }
-function replaceCapacityPayrollRows(rows){
- // The newest ServiceTitan Timesheet upload is authoritative for Capacity.
+function replaceCapacityPayrollRows(rows,rangeStart='',rangeEnd=''){
+ // Replace every future row within the new report's date range, not just
+ // rows with matching memo text. A removed memo must disappear completely.
+ // Today's and older records are snapshots; preserve dates outside the file.
+ const today=todayISO(),valid=(rows||[]).filter(r=>!!r.date);
+ const lo=rangeStart||valid.map(r=>r.date).sort()[0]||'';
+ const hi=rangeEnd||valid.map(r=>r.date).sort().at(-1)||'';
+ const prior=state.capacityTimesheetRows||[];
+ const historicalDates=new Set(prior.filter(r=>r.date<=today).map(r=>r.date));
+ const untouched=prior.filter(r=>r.date<=today||!lo||!hi||r.date<lo||r.date>hi);
+ // Initial historical import is allowed; subsequent files cannot rewrite
+ // an already recorded today/past day's snapshot.
+ const incoming=valid.filter(r=>r.date>today||!historicalDates.has(r.date));
  const key=r=>`${r.employee}|${r.date}|${r.activity}|${r.jobNumber||''}|${r.businessUnit||''}|${r.memo||''}`;
- const map=new Map();
- for(const r of rows)map.set(key(r),r);
+ const map=new Map();for(const r of [...untouched,...incoming])map.set(key(r),r);
  state.capacityTimesheetRows=[...map.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.employee.localeCompare(b.employee));
  rebuildCapacityCrewHistory();
 }
@@ -1679,7 +1693,7 @@ function prodStats(date){
  for(const j of jobs){
   const st=j.status||'Start',nonInstall=productionIsNonRevenueVisit(j);if(!j.mtdOnly&&!nonInstall){confirmed+=Number(j.confirmedTotal)||0;expectedJobs++}
   if(!nonInstall&&COMPLETED_STATUSES.has(st)){completed++;if(j.mtdReconciledAt)actual+=Number(j.actualCollected||0)}
-  if(!nonInstall&&productionIsBreakage(st)){breakage+=Number(j.confirmedTotal)||0;breakageJobs++}if(INCOMPLETE_AUTO.has(st))incomplete+=Number(j.incomplete||j.confirmedTotal||0);if(!nonInstall&&j.missingItems)missing++;if(!nonInstall&&j.vendorIssue)vendor++;if(j.mtdReconciledAt&&!nonInstall&&COMPLETED_STATUSES.has(st)&&!productionIsBreakage(st))changeOrders+=Number(j.actualCollected||0)-Number(j.confirmedTotal||0);if(j.mtdReconciledAt&&!nonInstall&&COMPLETED_STATUSES.has(st)&&!productionIsBreakage(st))reconciled++;if(jobNeedsInternalCloseout(j)){internalCloseoutNeeded++;if(closeoutChecklistComplete(j))internalCloseoutComplete++}
+  if(!nonInstall&&productionIsBreakage(st)){breakage+=Number(j.confirmedTotal)||0;breakageJobs++}if(!nonInstall&&INCOMPLETE_AUTO.has(st))incomplete+=Number(j.incomplete||j.confirmedTotal||0);if(!nonInstall&&j.missingItems)missing++;if(!nonInstall&&j.vendorIssue)vendor++;if(j.mtdReconciledAt&&!nonInstall&&COMPLETED_STATUSES.has(st)&&!productionIsBreakage(st))changeOrders+=Number(j.actualCollected||0)-Number(j.confirmedTotal||0);if(j.mtdReconciledAt&&!nonInstall&&COMPLETED_STATUSES.has(st)&&!productionIsBreakage(st))reconciled++;if(jobNeedsInternalCloseout(j)){internalCloseoutNeeded++;if(closeoutChecklistComplete(j))internalCloseoutComplete++}
  }
  // MTD is the source of completed dollars, but an operational breakage (or open job)
  // cannot be converted into completed revenue by a stale MTD summary row.
@@ -1692,10 +1706,10 @@ function prodStats(date){
  const successRate=expectedJobs?completed/expectedJobs:0;return{jobs:jobs.filter(j=>!productionIsNonRevenueVisit(j)).length,confirmed,expectedJobs,completed,actual,breakage,breakageJobs,incomplete,missing,vendor,successRate,changeOrders,reconciled,closeoutConfirmed,needsConfirmation,internalCloseoutComplete,internalCloseoutNeeded,mtdDaily:mtd};
 }
 function productionTagInfo(raw){const tokens=String(raw||'').split(/[,;|]/).map(x=>x.trim()).filter(Boolean),tags=[];let appointmentCounter='';for(const token of tokens){let label='';if(/^tier\s*1$/i.test(token))label='Tier 1';else if(/^tier\s*2$/i.test(token))label='Tier 2';else if(/^tier\s*3$/i.test(token))label='Tier 3';else if(/^(?:unscheduled\s*)?2\s*day$/i.test(token)||/^two\s*day$/i.test(token))label='2 Day';else if(/premium/i.test(token))label='Premium';else if(/cali\s*door/i.test(token))label='Cali Door';else if(/\bbrkg\b|breakage/i.test(token))label='BRKG';else{const m=/^(?:appt|appointment)?\s*#?\s*([1-4])$/i.exec(token);if(m)appointmentCounter=m[1]}if(label&&!tags.includes(label))tags.push(label)}return{tags,appointmentCounter}}
-// Once a day begins, no Workflow upload may delete its jobs. Assignment
-// metadata may still refresh during that day; past dates are frozen.
+// A started day keeps its historical job ledger. Future date schedules and
+// report-derived facts must always reflect the latest imported report.
 function productionDayStarted(date){return /^\d{4}-\d{2}-\d{2}$/.test(String(date||''))&&String(date)<=todayISO()}
-// Historical snapshots freeze after the installation date, not during its day.
+// All date-scoped history is frozen before the current day.
 function productionDayPast(date){return /^\d{4}-\d{2}-\d{2}$/.test(String(date||''))&&String(date)<todayISO()}
 function productionWorkflowKey(date,jobNumber){return `${String(date||'')}-${String(jobNumber||'').trim()}`}
 function productionWorkflowManuallyRemoved(date,jobNumber){return !!state.productionWorkflowManualRemovals?.[productionWorkflowKey(date,jobNumber)]}
@@ -1756,6 +1770,15 @@ function workflowAppointmentPlan(row){
 function productionVisitRole(job){
  const p=workflowAppointmentPlan(dailyWorkflowRecordForJob(job));
  if(!p)return {role:job.workflowTwoDayFirstVisit?'two-day-first':'install',plan:null};
+ // A Workflow edit can move a finish date forward after a job has already
+ // appeared on today's protected board. Keep that old row for audit, but do
+ // not count its old scheduled revenue on the previous finishing day.
+ // Historical dates strictly use their captured appointment snapshot.
+ const live=!!job.workflowManaged&&job.date>=todayISO();
+ if(live&&p.next&&p.last&&job.date!==p.next&&job.date!==p.last){
+  if(p.twoDay&&job.date>p.next&&job.date<p.last)return {role:'two-day-prior',plan:p};
+  return {role:'rescheduled',plan:p};
+ }
  if(p.distinct&&job.date===p.next){
   if(p.piiFirst)return {role:'pii-preparation',plan:p};
   if(p.caliReturn)return {role:'cali-install',plan:p};
@@ -1766,7 +1789,7 @@ function productionVisitRole(job){
 }
 function productionIsNonRevenueVisit(job){
  const role=productionVisitRole(job).role;
- return role==='pii-preparation'||role==='cali-door-hourly'||role==='two-day-first';
+ return role==='pii-preparation'||role==='cali-door-hourly'||role==='two-day-first'||role==='two-day-prior'||role==='rescheduled';
 }
 function dailyJobHasTwoDayEvidence(job){
  const p=workflowAppointmentPlan(dailyWorkflowRecordForJob(job));
@@ -1779,7 +1802,9 @@ function dailyAppointmentBadge(job){
  if(!p)return job.appointmentCounter?statusChip(String(job.appointmentCounter),'info'):'—';
  const n=p.total?String(p.total)+' total':'Total unknown';
  let label=n,kind='info';
- if(v.role==='pii-preparation'){label+=' · PII only';kind='warn'}
+ if(v.role==='rescheduled'){label+=' · Moved';kind='warn'}
+ else if(v.role==='two-day-prior'){label+=' · Prior visit';kind='info'}
+ else if(v.role==='pii-preparation'){label+=' · PII only';kind='warn'}
  else if(v.role==='cali-door-hourly'){label+=' · Door only';kind='warn'}
  else if(v.role==='two-day-first'){label+=' · Day 1';kind='info'}
  else if(p.twoDay){label+=' · 2-day';kind='info'}
@@ -1792,16 +1817,28 @@ function dailyWorkflowVisitLabel(job){
  if(role==='pii-preparation')return '<span class="dp074-nonrev">PII first visit · not install revenue</span>';
  if(role==='cali-door-hourly')return '<span class="dp074-nonrev">Cali door only · hourly</span>';
  if(role==='two-day-first')return '<span class="dp074-nonrev">Day 1 of 2 · not completed revenue</span>';
+ if(role==='two-day-prior')return '<span class="dp074-nonrev">Prior two-day visit · no expected finish revenue</span>';
+ if(role==='rescheduled')return '<span class="dp074-nonrev">Rescheduled · excluded from prior-date forecast</span>';
  return '';
 }
 function productionTagChips(j){const info=productionTagInfo(dailyJobTags(j));const tags=info.tags;return tags.length?tags.map(t=>statusChip(t,t==='BRKG'?'bad':t==='2 Day'||t==='Cali Door'?'warn':'info')).join(' '):'<span class="muted">—</span>'}
 function getObjValue(obj,patterns){for(const [k,v] of Object.entries(obj||{})){if(patterns.some(p=>p.test(k)))return v}return''}
-function syncProductionMetadata(job,obj){if(!job||!obj)return;const crew=getObjValue(obj,[/assigned technicians/i,/assigned tech/i,/installer/i]);const tags=getObjValue(obj,[/^tags?$/i,/workflow flags/i,/current tags/i,/job tags/i]);const counter=getObjValue(obj,[/appointment.*counter/i,/appt.*counter/i,/appointment count/i]);if(crew&&!job.installers)job.installers=String(crew);if(tags){job.tagsRaw=String(tags);const info=productionTagInfo(tags);job.relevantTags=info.tags;if(!job.appointmentCounter&&info.appointmentCounter)job.appointmentCounter=info.appointmentCounter}if(counter!==''&&counter!=null&&/^[1-4]$/.test(String(counter).trim()))job.appointmentCounter=String(counter).trim();const total=getObjValue(obj,[/^total appointments$/i]);if(total!==''&&total!=null&&Number(total)>0)job.totalAppointments=Number(total)}
+function syncProductionMetadata(job,obj){
+ if(!job||!obj||productionDayStarted(job.date)||job.workflowManagerOverride)return;
+ const crew=getObjValue(obj,[/assigned technicians/i,/assigned tech/i,/installer/i]);
+ const tags=getObjValue(obj,[/^job tags$/i,/^tags?$/i,/workflow flags/i,/current tags/i]);
+ const counter=getObjValue(obj,[/appointment.*counter/i,/appt.*counter/i,/appointment count/i]);
+ job.installers=String(crew??''); // Empty in a new report means unassigned.
+ job.tagsRaw=String(tags??''); // Removed tags must disappear from the forecast.
+ const info=productionTagInfo(job.tagsRaw);job.relevantTags=info.tags;
+ job.appointmentCounter=counter!==''&&counter!=null&&/^[1-4]$/.test(String(counter).trim())?String(counter).trim():info.appointmentCounter||'';
+ const total=getObjValue(obj,[/^total appointments$/i]);job.totalAppointments=Number(total)||0;
+}
 function workflowValue(obj,patterns){return getObjValue(obj,patterns)}
 function syncProductionMetadataFromWorkflow(obj){
  const jobNo=String(workflowValue(obj,[/^job\s*(number|#)$/i,/job number/i])||'').trim();if(!jobNo)return;
  // The installation day can refresh assignment metadata; past days cannot.
- for(const job of state.productionJobs.filter(j=>String(j.jobNumber)===jobNo&&!productionDayPast(j.date)&&!j.workflowManagerOverride))syncProductionMetadata(job,obj);
+ for(const job of state.productionJobs.filter(j=>String(j.jobNumber)===jobNo&&j.date>todayISO()&&!j.workflowManagerOverride))syncProductionMetadata(job,obj);
 }
 function upsertDailyFromWorkflow(obj,importId,dateOverride="",isFirstVisit=false){
  const jobNo=String(workflowValue(obj,[/^job\s*(number|#)$/i,/job number/i])||'').trim(),status=String(workflowValue(obj,[/^job status$/i])||'').trim();
@@ -1813,26 +1850,29 @@ function upsertDailyFromWorkflow(obj,importId,dateOverride="",isFirstVisit=false
  // After the installation date, freeze the entire job ledger. On the
  // installation date, allow Workflow to refresh scheduling details without
  // ever changing the original confirmed amount, job outcome or notes.
- if(job&&productionDayPast(date)){
+ if(job&&productionDayStarted(date)){
   if(!job.workflowAppointmentSnapshot)job.workflowAppointmentSnapshot=productionWorkflowSnapshot(obj);
-  job.workflowRetainedFromEarlierImport=false;
   return job;
  }
  const total=toNumber(workflowValue(obj,[/^jobs total$/i,/^job total$/i])),customer=String(workflowValue(obj,[/^customer name$/i,/^customer$/i])||''),crew=String(workflowValue(obj,[/^assigned technicians$/i,/assigned tech/i,/installer/i])||''),notes=String(workflowValue(obj,[/^job notes$/i,/^notes?$/i])||''),tags=String(workflowValue(obj,[/^job tags$/i,/^tags$/i])||'');
  if(!job){
-  job={id:uid('job'),date,jobNumber:jobNo,customer,confirmedTotal:total,incomplete:0,installers:crew,notes,status:'Start',changeOrder:0,actualCollected:0,closed:false,workflowTwoDayFirstVisit:!!isFirstVisit,source:importId,workflowManaged:true,workflowSourceImportId:importId,workflowJobStatus:status,tagsRaw:tags,relevantTags:[],appointmentCounter:'',closeoutConfirmed:false,closeoutConfirmedAt:'',closeoutChecklist:{allConfirmed:false,requiredPhotos:false,requiredMaterials:false,paymentVerified:false,completedAt:''}};
+  job={id:uid('job'),date,jobNumber:jobNo,customer,confirmedTotal:total,incomplete:0,installers:crew,notes,status:'Start',changeOrder:0,actualCollected:0,closed:false,workflowTwoDayFirstVisit:!!isFirstVisit,source:importId,workflowManaged:true,workflowSourceImportId:importId,workflowJobStatus:status,workflowSourceNotes:notes,tagsRaw:tags,relevantTags:[],appointmentCounter:'',closeoutConfirmed:false,closeoutConfirmedAt:'',closeoutChecklist:{allConfirmed:false,requiredPhotos:false,requiredMaterials:false,paymentVerified:false,completedAt:''}};
   state.productionJobs.push(job);
  }else{
-  if(!job.customer&&customer)job.customer=customer;
-  // Morning confirmed value is frozen after first creation; later Workflow refreshes do not rewrite it.
-  if(job.confirmedTotal==null)job.confirmedTotal=total;
-  if(!job.workflowManagerOverride){if(crew&&!job.calloutNames?.length)job.installers=crew;if(tags)job.tagsRaw=tags;}if(!job.notes&&notes)job.notes=notes;
-  job.workflowManaged=job.workflowManaged!==false;job.workflowSourceImportId=importId;job.workflowJobStatus=status;if(isFirstVisit)job.workflowTwoDayFirstVisit=true;
+  if(!productionDayStarted(date)){
+   // Forward schedule is live. Protect only explicit manager-entered details.
+   job.customer=customer||job.customer||'';
+   job.confirmedTotal=total;
+   if(!job.notes||job.notes===job.workflowSourceNotes)job.notes=notes;
+   job.workflowSourceNotes=notes;
+  }
+  job.workflowManaged=job.workflowManaged!==false;job.workflowSourceImportId=importId;
+  job.workflowJobStatus=status;job.workflowTwoDayFirstVisit=!!isFirstVisit;
  }
-  if(!job.workflowManagerOverride)syncProductionMetadata(job,obj);
-  if(productionDayStarted(date))job.workflowAppointmentSnapshot=productionWorkflowSnapshot(obj);
-  job.workflowRetainedFromEarlierImport=false;
-  return job;
+ if(!productionDayStarted(date))syncProductionMetadata(job,obj);
+ if(productionDayStarted(date)&&!job.workflowAppointmentSnapshot)job.workflowAppointmentSnapshot=productionWorkflowSnapshot(obj);
+ job.workflowRetainedFromEarlierImport=false;
+ return job;
 }
 function reconcileWorkflowManagedJobs(activeKeys,importId){
  const today=todayISO();
@@ -1846,11 +1886,9 @@ function reconcileWorkflowManagedJobs(activeKeys,importId){
    return true;
   }
   if(stillListed){j.workflowRetainedFromEarlierImport=false;return true}
-  // Future jobs continue to track the latest Workflow schedule, unless a
-  // manager has edited the job, documented an issue, or started closeout.
-  const manual=String(j.status||'Start')!=='Start'||j.mtdReconciledAt||closeoutChecklistCount(j)>0||j.closed||!!String(j.issues||'').trim()||!!String(j.reason||'').trim()||!!String(j.missingItems||'').trim()||!!String(j.vendorIssue||'').trim();
-  j.workflowRetainedFromEarlierImport=!!manual;
-  return !!manual;
+  // Future Workflow-managed rows that disappeared no longer consume expected
+  // jobs, revenue or staffing. Manual independent jobs are preserved above.
+  return false;
  });
 }
 function latestProdDate(){
@@ -3076,10 +3114,12 @@ function importTechTimesheet(book,importId,fileName='ServiceTitan Payroll'){
 
  const filterStart=parseDateCell(workbookFilterValue(book,/^Master Pay File From$/i))||earliest;
  const filterEnd=parseDateCell(workbookFilterValue(book,/^Master Pay File To$/i))||latest;
- replaceCapacityPayrollRows(crewRows);
+ replaceCapacityPayrollRows(crewRows,filterStart,filterEnd);
+ const existingCoverage=state.capacityPayrollCoverage||{};
  state.capacityPayrollCoverage={
   importId,fileName,
-  rangeStart:filterStart,rangeEnd:filterEnd,
+  rangeStart:existingCoverage.rangeStart&&existingCoverage.rangeStart<filterStart?existingCoverage.rangeStart:filterStart,
+  rangeEnd:existingCoverage.rangeEnd&&existingCoverage.rangeEnd>filterEnd?existingCoverage.rangeEnd:filterEnd,
   earliestDate:filterStart,latestDate:filterEnd,
   rowEarliestDate:earliest,rowLatestDate:latest,
   leaveRecords:0,unmatchedLeaveRecords:0,rowCount:recognizedRows,
@@ -3147,7 +3187,7 @@ function importWorkflow(book,importId,fileName='Production Workflow'){
  const h=findBestHeaderRow(book,[[/^last appt date$/,/last appointment date/],[/^job status$/,/job status/],[/^jobs total$/,/^job total$/,/jobs total/],[/^job\s*#$/,/job number/]]);
  if(!h)throw Error('Could not map Job #, Last Appt Date, Job Status, and Jobs Total in the Production Workflow report.');
  const headers=h.headers;
-  const protectedBeforeImport=new Set((state.productionJobs||[]).filter(j=>productionDayPast(j.date)).map(j=>productionWorkflowKey(j.date,j.jobNumber)));
+  const protectedBeforeImport=new Set((state.productionJobs||[]).filter(j=>productionDayStarted(j.date)).map(j=>productionWorkflowKey(j.date,j.jobNumber)));
   state.workflowRows=[];let latest='',rowsRead=0;const activeDailyKeys=new Set();
  for(const r of h.s.rows.slice(h.row+1)){
   if(!r.some(v=>v!==undefined&&v!==null&&v!==''))continue;
@@ -3182,8 +3222,11 @@ function importWorkflow(book,importId,fileName='Production Workflow'){
   if(d>latest)latest=d;
  }
  if(!rowsRead)throw Error('Production Workflow headers were found, but no workflow rows could be read.');
- reconcileWorkflowManagedJobs(activeDailyKeys,importId);const scheduleReview=refreshWorkflowScheduleReview(),employeeReview=refreshPayrollRosterReview();rebuildWBRData();
- audit('Production Workflow refreshed','Capacity / WBR / Daily Production',`${rowsRead} rows loaded • ${activeDailyKeys.size} Start/Scheduled daily jobs synced • ${scheduleReview.sunday.length} Sunday review item${scheduleReview.sunday.length===1?'':'s'} • ${employeeReview.length} report employee${employeeReview.length===1?'':'s'} not linked to Employee Manager`);
+ const oldFutureKeys=new Set((state.productionJobs||[]).filter(j=>j.workflowManaged&&j.date>todayISO()).map(j=>productionWorkflowKey(j.date,j.jobNumber)));
+ reconcileWorkflowManagedJobs(activeDailyKeys,importId);
+ const removedFuture=[...oldFutureKeys].filter(k=>!(state.productionJobs||[]).some(j=>productionWorkflowKey(j.date,j.jobNumber)===k));
+ const scheduleReview=refreshWorkflowScheduleReview(),employeeReview=refreshPayrollRosterReview();rebuildWBRData();
+ audit('Production Workflow refreshed','Capacity / WBR / Daily Production',`${rowsRead} rows loaded • ${activeDailyKeys.size} Start/Scheduled daily jobs synced • ${removedFuture.length} future job rows removed from outdated Workflow • ${scheduleReview.sunday.length} Sunday review item${scheduleReview.sunday.length===1?'':'s'} • ${employeeReview.length} report employee${employeeReview.length===1?'':'s'} not linked to Employee Manager`);
  return latest||asOf();
 }
 
@@ -3815,6 +3858,7 @@ function dp078RowClass(job){
 function dp078JobLabels(j){
  const labels=[];
  if(dailyJobHasTwoDayEvidence(j))labels.push('<span class="dp078-pill two">2 Day</span>');
+ const visit=productionVisitRole(j);if(visit.role==='rescheduled')labels.push(`<span class="dp078-pill issue">Moved to ${esc(visit.plan?.last?shortDate(visit.plan.last):'another date')} · not today revenue</span>`);else if(visit.role==='two-day-prior'||visit.role==='two-day-first')labels.push(`<span class="dp078-pill two">Finishes ${esc(visit.plan?.last?shortDate(visit.plan.last):'later')}</span>`);
  if(productionJobRowType(j)==='dp-job-cali')labels.push('<span class="dp078-pill cali">Cali</span>');
  if(productionJobRowType(j)==='dp-job-breakage'&&!productionIsBreakage(j.status))labels.push('<span class="dp078-pill warn">BRKG tag · review</span>');
  if(j.mtdReconciledAt&&productionIsBreakage(j.status))labels.push('<span class="dp078-pill issue">MTD conflict · verify</span>');
@@ -3843,7 +3887,7 @@ function dp078Row(j){
   <td><b class="dp078-customer">${esc(j.customer||'—')}</b>${town?`<div class="dp078-minor">${esc(town)}</div>`:''}</td>
   <td class="dp078-crew">${productionCrewHtml(j)}</td>
   <td class="dp078-statuscell">${statusChip(j.status||'Start',productionStatusTone(j.status||'Start'))}${productionIsDone(j)?'<span class="dp080-done" title="Installation finished and final closeout checklist confirmed">✓ Done</span>':''}<div class="dp078-tags">${flags}</div>${reason?`<div class="dp078-reason" title="${esc(reason)}">${esc(reason.slice(0,90))}${reason.length>90?'…':''}</div>`:''}</td>
-  <td class="dp078-money">${productionIsNonRevenueVisit(j)?'—':money(confirmed)}</td>
+  <td class="dp078-money">${productionIsNonRevenueVisit(j)?'<span class="dp078-dash" title="No expected finish revenue on this date">—</span>':money(confirmed)}</td>
   <td class="dp078-money">${completed}</td>
   <td class="dp078-money">${discrepancy?`<b class="dp078-diff">${actual>confirmed?'+':''}${money(actual-confirmed)}</b>`:'<span class="dp078-dash">—</span>'}</td>
   <td><button type="button" class="btn small dp078-action" data-dp077-update="${esc(j.id)}">Update</button></td>
@@ -3872,17 +3916,20 @@ function dp082OperationalRow(v){
 }
 function dp078Table(jobs){
  const active=jobs.filter(j=>j.status!=='Deleted');
- const open=active.filter(j=>dp078Stage(j)==='open').sort((a,b)=>{
+ const moved=active.filter(j=>productionVisitRole(j).role==='rescheduled');
+ const scheduled=active.filter(j=>productionVisitRole(j).role!=='rescheduled');
+ const open=scheduled.filter(j=>dp078Stage(j)==='open').sort((a,b)=>{
   const priority=x=>x.status==='On Hold'||x.status==='Needs Return'||x.status==='Incomplete - not Breakage'||productionHasIssue(x)?0:x.status==='In Progress'?1:2;
   return priority(a)-priority(b)||String(a.jobNumber).localeCompare(String(b.jobNumber));
  });
- const breaks=active.filter(j=>dp078Stage(j)==='breakage');
- const finished=active.filter(j=>dp078Stage(j)==='finished');
+ const breaks=scheduled.filter(j=>dp078Stage(j)==='breakage');
+ const finished=scheduled.filter(j=>dp078Stage(j)==='finished');
  const revenue=breaks.filter(j=>!productionIsNonRevenueVisit(j)).reduce((n,j)=>n+Number(j.confirmedTotal||0),0);
  const operational=warrantyVisitsOn(dailyDate);
  const sections=[
   {title:'Open Jobs',note:'Unfinished installations first',rows:open,cls:'open'},
   {title:'Other Jobs',note:`${operational.length} Warranty / OOM / Training / Shop assignments · no install revenue`,rows:operational,cls:'other'},
+  {title:'Moved / Rescheduled',note:'Prior schedule entry retained for audit · excluded from today’s production totals',rows:moved,cls:'moved'},
   {title:'Breakage',note:`${breaks.length} unsuccessful · ${money(revenue)} not completed`,rows:breaks,cls:'breakage'},
   {title:'Completed',note:'Finished jobs moved to the bottom',rows:finished,cls:'done'}
  ];
@@ -4784,7 +4831,7 @@ function wbrOldestQueueJobs(rows,referenceDate){
 }
 function wbrRegionalRows(start,end){return [...new Map((state.regionalTrackerRows||[]).filter(r=>r.date>=start&&r.date<=end).map(r=>[r.date,r])).values()]}
 function wbrRegionalTotal(start,end,key){const a=wbrRegionalRows(start,end);return a.length?a.reduce((s,r)=>s+Number(r[key]||0),0):null}
-// v0.82: Completed MTD is an MTD report value, not a Regional Tracker subtotal.
+// v0.83: Completed MTD is an MTD report value, not a Regional Tracker subtotal.
 // Never substitute a Regional Tracker value if this source is missing, from the
 // wrong month, or has a known partial-month starting boundary.
 function wbrMtdCompletedFor(ref){
