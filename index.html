@@ -673,6 +673,10 @@ button{cursor:pointer}
 .dp081-guard:empty{display:none}
 .dp081-guard .status{font-size:9px;padding:3px 7px}
 
+/* v0.84 — callout resolution and displaced-crew flags */
+.dp084-callout{display:grid;gap:12px}.dp084-callout .field{margin:0}.dp084-callout .sp-help{margin:0}
+.dp078-row.dp078-rescheduled{background:#fff8ea}.dp078-rescheduled .dp078-statuscell .status{background:#ffebcb!important;color:#815116!important}
+.dp078-row .dp078-tags .dp078-pill.issue{max-width:380px;white-space:normal}
 </style>
 <style>
 </style>
@@ -950,11 +954,11 @@ const DEFAULT_OBSERVED_HOLIDAYS=[
  {id:'holiday-2027-thanksgiving',date:'2027-11-25',name:'Thanksgiving Day',source:'Provided schedule'},
  {id:'holiday-2027-christmas',date:'2027-12-24',name:'Christmas Day',source:'Provided schedule'}
 ];
-const PROD_STATUSES=['Start','Complete','Complete 2in1','2 Day - Day 1 Complete','2 Day Complete','Breakage/U2Day','Breakage - RTO','Incomplete - not Breakage','Cali Day 1','Cali RTO','Cali Complete'];
+const PROD_STATUSES=['Start','Rescheduled','Complete','Complete 2in1','2 Day - Day 1 Complete','2 Day Complete','Breakage/U2Day','Breakage - RTO','Incomplete - not Breakage','Cali Day 1','Cali RTO','Cali Complete'];
 const COMPLETED_STATUSES=new Set(['Complete','Complete 2in1','2 Day Complete','Cali Complete','Cali RTO']);
 const BREAKAGE_STATUSES=new Set(['Breakage/U2Day','Breakage - RTO']);
 function productionIsBreakage(status){return !/^(?:Incomplete\s*-\s*not\s*Breakage)$/i.test(String(status||'')) && (BREAKAGE_STATUSES.has(status)||/\bbreakage\b/i.test(String(status||'')))}
-function productionRequiresReason(status){return String(status||'')==='Incomplete - not Breakage'||productionIsBreakage(status)}
+function productionRequiresReason(status){return status==='Rescheduled'||String(status||'')==='Incomplete - not Breakage'||productionIsBreakage(status)}
 function productionStatusLabel(status){return String(status||'Start')} // Display precisely the manager-selected job status
 function productionStatusTone(status){return productionIsBreakage(status)?'bad':COMPLETED_STATUSES.has(status)||status==='Start'?'good':DAY1_CLOSED_STATUSES.has(status)?'info':'warn'}
 const DAY1_CLOSED_STATUSES=new Set(['2 Day - Day 1 Complete','Cali Day 1']);
@@ -1642,8 +1646,11 @@ function futureCapacityRows(rows){
   const bucket=(by[d]??={jobs:new Map(),revenue:0,businessUnits:new Set()});
   if(buKey&&String(r[buKey]||'').trim())bucket.businessUnits.add(String(r[buKey]).trim());
   if(!bucket.jobs.has(id)){
-   const pc=parseAssignedCrew(assignedKey?r[assignedKey]:'',d);
-   bucket.jobs.set(id,{jobNumber:id,leadCount:pc.leadCount,supportCount:pc.supportCount,assigned:!!String(assignedKey?r[assignedKey]:'').trim(),assignedNames:String(assignedKey?r[assignedKey]:'').trim(),revenue:Number(r[totalKey]||0),businessUnit:buKey?String(r[buKey]||'').trim():'',appointmentDates:dates});
+   const manual=(state.productionJobs||[]).find(j=>j.date===d&&String(j.jobNumber)===id);
+   if(manual?.status==='Rescheduled')continue;
+   const assignedText=manual?.crewManagerOverride?String(manual.installers||''):String(assignedKey?r[assignedKey]:'');
+   const pc=parseAssignedCrew(assignedText,d);
+   bucket.jobs.set(id,{jobNumber:id,leadCount:pc.leadCount,supportCount:pc.supportCount,assigned:!!assignedText.trim(),assignedNames:assignedText.trim(),revenue:Number(r[totalKey]||0),businessUnit:buKey?String(r[buKey]||'').trim():'',appointmentDates:dates});
    bucket.revenue+=Number(r[totalKey]||0);
   }
   }
@@ -1689,9 +1696,12 @@ function productionIsDone(j){return !!(j&&COMPLETED_STATUSES.has(j.status)&&j.cl
 function closeoutChecklistCount(j){const c=closeoutChecklistFor(j);return [c.requiredPhotos,c.requiredMaterials,c.paymentVerified].filter(Boolean).length}
 function jobNeedsInternalCloseout(j){return !!j&&COMPLETED_STATUSES.has(j.status)&&!productionIsNonRevenueVisit(j)}
 function prodStats(date){
- const jobs=prodDayJobs(date),mtd=mtdDailyTotal(date);let confirmed=0,completed=0,actual=0,breakage=0,breakageJobs=0,incomplete=0,missing=0,vendor=0,expectedJobs=0,changeOrders=0,reconciled=0,closeoutConfirmed=0,needsConfirmation=0,internalCloseoutComplete=0,internalCloseoutNeeded=0;
+ const jobs=prodDayJobs(date),mtd=mtdDailyTotal(date);let confirmed=0,completed=0,actual=0,breakage=0,breakageJobs=0,rescheduled=0,rescheduledJobs=0,incomplete=0,missing=0,vendor=0,expectedJobs=0,changeOrders=0,reconciled=0,closeoutConfirmed=0,needsConfirmation=0,internalCloseoutComplete=0,internalCloseoutNeeded=0;
  for(const j of jobs){
-  const st=j.status||'Start',nonInstall=productionIsNonRevenueVisit(j);if(!j.mtdOnly&&!nonInstall){confirmed+=Number(j.confirmedTotal)||0;expectedJobs++}
+  const st=j.status||'Start',nonInstall=productionIsNonRevenueVisit(j),visit=productionVisitRole(j).role;
+  const originallyBooked=st==='Rescheduled'&&!['two-day-first','two-day-prior','pii-preparation','cali-door-hourly','rescheduled'].includes(visit)&&!j.mtdOnly;
+  if(originallyBooked){rescheduled+=Number(j.confirmedTotal)||0;rescheduledJobs++;confirmed+=Number(j.confirmedTotal)||0}
+  if(!j.mtdOnly&&!nonInstall){confirmed+=Number(j.confirmedTotal)||0;expectedJobs++}
   if(!nonInstall&&COMPLETED_STATUSES.has(st)){completed++;if(j.mtdReconciledAt)actual+=Number(j.actualCollected||0)}
   if(!nonInstall&&productionIsBreakage(st)){breakage+=Number(j.confirmedTotal)||0;breakageJobs++}if(!nonInstall&&INCOMPLETE_AUTO.has(st))incomplete+=Number(j.incomplete||j.confirmedTotal||0);if(!nonInstall&&j.missingItems)missing++;if(!nonInstall&&j.vendorIssue)vendor++;if(j.mtdReconciledAt&&!nonInstall&&COMPLETED_STATUSES.has(st)&&!productionIsBreakage(st))changeOrders+=Number(j.actualCollected||0)-Number(j.confirmedTotal||0);if(j.mtdReconciledAt&&!nonInstall&&COMPLETED_STATUSES.has(st)&&!productionIsBreakage(st))reconciled++;if(jobNeedsInternalCloseout(j)){internalCloseoutNeeded++;if(closeoutChecklistComplete(j))internalCloseoutComplete++}
  }
@@ -1703,7 +1713,7 @@ function prodStats(date){
  reconciled=recognized.length;
  closeoutConfirmed=recognized.filter(j=>j.closeoutConfirmed).length;
  needsConfirmation=recognized.filter(j=>!j.closeoutConfirmed).length;
- const successRate=expectedJobs?completed/expectedJobs:0;return{jobs:jobs.filter(j=>!productionIsNonRevenueVisit(j)).length,confirmed,expectedJobs,completed,actual,breakage,breakageJobs,incomplete,missing,vendor,successRate,changeOrders,reconciled,closeoutConfirmed,needsConfirmation,internalCloseoutComplete,internalCloseoutNeeded,mtdDaily:mtd};
+ const successRate=expectedJobs?completed/expectedJobs:0;return{jobs:jobs.filter(j=>!productionIsNonRevenueVisit(j)).length,confirmed,expectedJobs,completed,actual,breakage,breakageJobs,rescheduled,rescheduledJobs,incomplete,missing,vendor,successRate,changeOrders,reconciled,closeoutConfirmed,needsConfirmation,internalCloseoutComplete,internalCloseoutNeeded,mtdDaily:mtd};
 }
 function productionTagInfo(raw){const tokens=String(raw||'').split(/[,;|]/).map(x=>x.trim()).filter(Boolean),tags=[];let appointmentCounter='';for(const token of tokens){let label='';if(/^tier\s*1$/i.test(token))label='Tier 1';else if(/^tier\s*2$/i.test(token))label='Tier 2';else if(/^tier\s*3$/i.test(token))label='Tier 3';else if(/^(?:unscheduled\s*)?2\s*day$/i.test(token)||/^two\s*day$/i.test(token))label='2 Day';else if(/premium/i.test(token))label='Premium';else if(/cali\s*door/i.test(token))label='Cali Door';else if(/\bbrkg\b|breakage/i.test(token))label='BRKG';else{const m=/^(?:appt|appointment)?\s*#?\s*([1-4])$/i.exec(token);if(m)appointmentCounter=m[1]}if(label&&!tags.includes(label))tags.push(label)}return{tags,appointmentCounter}}
 // A started day keeps its historical job ledger. Future date schedules and
@@ -1788,6 +1798,7 @@ function productionVisitRole(job){
  return {role:'install',plan:p};
 }
 function productionIsNonRevenueVisit(job){
+ if(job?.status==='Rescheduled')return true;
  const role=productionVisitRole(job).role;
  return role==='pii-preparation'||role==='cali-door-hourly'||role==='two-day-first'||role==='two-day-prior'||role==='rescheduled';
 }
@@ -1828,7 +1839,13 @@ function syncProductionMetadata(job,obj){
  const crew=getObjValue(obj,[/assigned technicians/i,/assigned tech/i,/installer/i]);
  const tags=getObjValue(obj,[/^job tags$/i,/^tags?$/i,/workflow flags/i,/current tags/i]);
  const counter=getObjValue(obj,[/appointment.*counter/i,/appt.*counter/i,/appointment count/i]);
- job.installers=String(crew??''); // Empty in a new report means unassigned.
+ if(job.crewManagerOverride){
+  const wfNames=[...new Set(schedulerAssignedFromText(crew??'').map(canonicalRosterName))].sort();
+  const localNames=[...new Set(schedulerAssignedFromText(job.installers||'').map(canonicalRosterName))].sort();
+  if(JSON.stringify(wfNames)===JSON.stringify(localNames)){job.crewManagerOverride=false;job.crewWorkflowConflict='';}
+  else job.crewWorkflowConflict=`Manager: ${localNames.join(' + ')||'None'} · Workflow: ${wfNames.join(' + ')||'None'}`;
+ }
+ if(!job.crewManagerOverride)job.installers=String(crew??''); // New Workflow regains control once the manager's crew appears in source.
  job.tagsRaw=String(tags??''); // Removed tags must disappear from the forecast.
  const info=productionTagInfo(job.tagsRaw);job.relevantTags=info.tags;
  job.appointmentCounter=counter!==''&&counter!=null&&/^[1-4]$/.test(String(counter).trim())?String(counter).trim():info.appointmentCounter||'';
@@ -2059,6 +2076,7 @@ function memoCapacityAssignments(date){
   const tags=[workflowValue(w,[/^job tags?$/i]),workflowValue(w,[/^tags?$/i])].filter(Boolean).join(',');
   const status=workflowValue(w,[/^job status$/i])||'';
   const dates=capacityWorkflowDates(w);
+  if(dates.some(d=>(state.productionJobs||[]).some(j=>j.date===d&&String(j.jobNumber)===String(id)&&j.status==='Rescheduled')))continue;
   // A job with no appointment on this day may still be a deliberately held slot,
   // but only if its assignment and memo match; never infer a held slot from status alone.
   add(id,workflowValue(w,[/^assigned technicians$/i,/assigned tech/i]),tags,status,
@@ -3719,7 +3737,7 @@ function productionProtectedDayHtml(date,jobs){
  if(!productionDayStarted(date))return '';
  const kept=jobs.filter(j=>j.workflowManaged&&j.workflowRetainedFromEarlierImport);
  const pending=kept.filter(j=>!j.closed&&!COMPLETED_STATUSES.has(j.status)&&!productionIsBreakage(j.status));
- return `<div class="alert info" style="margin:12px 0"><b>Daily Production protected:</b> ${esc(shortDate(date))} has started. New Workflow uploads cannot remove assigned jobs. ${productionDayPast(date)?'This historical day is locked against automatic changes.':'Crew and appointment details may refresh through today, but original confirmed totals, statuses, manager notes and closeout decisions are preserved.'} Only a manager using <b>Edit → Delete record</b> can remove a job.`+
+ return `<div class="alert info" style="margin:12px 0"><b>Daily Production protected:</b> ${esc(shortDate(date))} has started. New Workflow uploads cannot remove assigned jobs. ${productionDayPast(date)?'This historical day is locked against automatic changes.':'Crew and appointment details remain protected today; manager actions can update assignments, while new Workflow imports update only future dates.'} Only a manager using <b>Edit → Delete record</b> can remove a job.`+
  (kept.length?`<div style="margin-top:7px"><b>${kept.length} previously assigned job${kept.length===1?'':'s'} not on the latest Workflow upload:</b> ${kept.map(j=>'#'+esc(j.jobNumber)).join(', ')}. They remain on the board${pending.length?` — ${pending.length} still need a recorded outcome or closeout`:''}.</div>`:'')+'</div>';
 }
 
@@ -3759,7 +3777,8 @@ function dp077Card(j){
   needsCloseout?'<span class="dp077-flag warning">Checklist pending</span>':'',
   j.mtdReconciledAt&&COMPLETED_STATUSES.has(status)&&!j.closeoutConfirmed?'<span class="dp077-flag warning">MTD needs confirmation</span>':'',
   j.past5?'<span class="dp077-flag info">Past 5 PM</span>':'',
-  j.calloutNames?.length?`<span class="dp077-flag urgent">Callout: ${esc(j.calloutNames.join(', '))}</span>`:'',
+  j.calloutNames?.length?`<span class="dp077-flag urgent">Callout: ${esc(j.calloutNames.join(', '))}${j.calloutReplacements?.length?' · '+esc(j.calloutReplacements.map(x=>x.replacement).join(', '))+' covering':''}</span>`:'',
+  j.crewGapNote?`<span class="dp077-flag urgent">Crew gap: ${esc(j.crewGapNote)}</span>`:'',
   j.splitCommission5050==='Yes'?'<span class="dp077-flag info">50/50 split flagged</span>':'',
   j.missingItems?'<span class="dp077-flag warning">Missing items</span>':'',
   j.vendorIssue?'<span class="dp077-flag urgent">Vendor issue</span>':''
@@ -3817,6 +3836,7 @@ function dp077OpenUpdate(id){
   if(nowDone&&!wasDone&&!$('#dp077Finished').checked){$('#dp077Error').textContent='Confirm that the installation is actually finished before assigning a completed status.';return}
   const previousIssues=String(j.issues||'').trim(),issues=$('#dp077Issues').value.trim(),reason=$('#dp077Reason').value.trim(),markLate=$('#dp077Past5').checked;
   j.status=next;j.reason=reason;j.issues=issues;
+  if(next==='Rescheduled'){j.preRescheduleCrew=j.preRescheduleCrew||j.installers;j.installers='';j.crewManagerOverride=true;j.rescheduledAt=new Date().toISOString();}
   if(issues!==previousIssues){j.issueUpdatedAt=new Date().toISOString();j.issueCrewSnapshot=issues?j.installers||'':''}
   if(INCOMPLETE_AUTO.has(next)&&!j.incomplete)j.incomplete=Number(j.confirmedTotal||0);
   if(!INCOMPLETE_AUTO.has(next)&&j.incomplete===Number(j.confirmedTotal||0))j.incomplete=0;
@@ -3840,12 +3860,14 @@ function dp077OpenUpdate(id){
 // ---------- v0.78 — compact color-coded row board, open work first ----------
 function dp078Stage(job){
  const st=String(job.status||'Start');
+ if(st==='Rescheduled')return'rescheduled';
  if(productionIsBreakage(st))return'breakage';
  if(COMPLETED_STATUSES.has(st))return'finished';
  return'open';
 }
 function dp078RowClass(job){
  const stage=dp078Stage(job),kind=productionJobRowType(job);
+ if(stage==='rescheduled')return'dp078-rescheduled';
  if(stage==='breakage')return'dp-job-breakage dp078-breakage';
  if(stage==='finished')return'dp078-complete';
  if(kind==='dp-job-two-day')return'dp-job-two-day';
@@ -3869,7 +3891,11 @@ function dp078JobLabels(j){
  if(j.missingItems)labels.push('<span class="dp078-pill warn">Missing</span>');
  if(j.vendorIssue)labels.push('<span class="dp078-pill issue">Vendor</span>');
  if(j.past5)labels.push('<span class="dp078-pill warn">Past 5 PM</span>');
- if(j.calloutNames?.length)labels.push('<span class="dp078-pill issue">Callout</span>');
+ if(j.calloutNames?.length)labels.push(`<span class="dp078-pill issue" title="${esc(j.calloutNames.join(', '))}">Callout: ${esc(j.calloutNames.join(', '))}</span>`);
+ if(j.calloutReplacements?.length)labels.push(...j.calloutReplacements.map(x=>`<span class="dp078-pill warn">${esc(x.called)} → ${esc(x.replacement)}${x.fromJob?' · moved from #'+esc(x.fromJob):''}</span>`));
+ if(j.crewGapNote)labels.push(`<span class="dp078-pill issue">⚑ Needs crew · ${esc(j.crewGapNote)}</span>`);
+ if(j.crewWorkflowConflict)labels.push(`<span class="dp078-pill warn" title="${esc(j.crewWorkflowConflict)}">Manager crew differs from Workflow</span>`);
+ if(j.status==='Rescheduled')labels.push('<span class="dp078-pill issue">Lost install · needs new date</span>');
  if(j.splitCommission5050==='Yes')labels.push('<span class="dp078-pill warn">50/50</span>');
  if(jobNeedsInternalCloseout(j)&&!closeoutChecklistComplete(j))labels.push('<span class="dp078-pill warn">Checklist</span>');
  return labels.join('');
@@ -3887,7 +3913,7 @@ function dp078Row(j){
   <td><b class="dp078-customer">${esc(j.customer||'—')}</b>${town?`<div class="dp078-minor">${esc(town)}</div>`:''}</td>
   <td class="dp078-crew">${productionCrewHtml(j)}</td>
   <td class="dp078-statuscell">${statusChip(j.status||'Start',productionStatusTone(j.status||'Start'))}${productionIsDone(j)?'<span class="dp080-done" title="Installation finished and final closeout checklist confirmed">✓ Done</span>':''}<div class="dp078-tags">${flags}</div>${reason?`<div class="dp078-reason" title="${esc(reason)}">${esc(reason.slice(0,90))}${reason.length>90?'…':''}</div>`:''}</td>
-  <td class="dp078-money">${productionIsNonRevenueVisit(j)?'<span class="dp078-dash" title="No expected finish revenue on this date">—</span>':money(confirmed)}</td>
+  <td class="dp078-money">${j.status==='Rescheduled'&&!['two-day-first','two-day-prior','pii-preparation','cali-door-hourly','rescheduled'].includes(productionVisitRole(j).role)?`<span title="Original confirmed retained; now rescheduled · excluded from active expected revenue">${money(confirmed)}</span>`:productionIsNonRevenueVisit(j)?'<span class="dp078-dash" title="No expected finish revenue on this date">—</span>':money(confirmed)}</td>
   <td class="dp078-money">${completed}</td>
   <td class="dp078-money">${discrepancy?`<b class="dp078-diff">${actual>confirmed?'+':''}${money(actual-confirmed)}</b>`:'<span class="dp078-dash">—</span>'}</td>
   <td><button type="button" class="btn small dp078-action" data-dp077-update="${esc(j.id)}">Update</button></td>
@@ -3909,15 +3935,15 @@ function dp082OperationalRow(v){
  <td><strong class="dp078-job">#${esc(v.jobNumber||'—')}</strong><div class="dp078-minor">${esc(type)}</div></td>
  <td><b class="dp078-customer">${esc(type==='Warranty'?v.type:type)}</b>${notes?`<div class="dp078-minor" title="${esc(notes)}">${esc(notes.length>65?notes.slice(0,65)+'…':notes)}</div>`:''}</td>
  <td class="dp078-crew">${crew.length?crew.map(name=>`<div class="dp082-person">${esc(name)}</div>`).join(''):'<span class="dp082-unassigned">Not assigned</span>'}</td>
- <td class="dp078-statuscell"><span class="dp082-kind">${esc(type)}</span><div class="dp078-tags"><span class="dp082-cap-tag ${v.usesCapacity?'yes':'no'}">${v.usesCapacity?'Uses capacity':'No capacity used'}</span></div></td>
+ <td class="dp078-statuscell"><span class="dp082-kind">${esc(type)}</span><div class="dp078-tags"><span class="dp082-cap-tag ${v.usesCapacity?'yes':'no'}">${v.usesCapacity?'Uses capacity':'No capacity used'}</span>${v.coverageGap?`<span class="dp078-pill issue">⚑ Needs crew · ${esc(v.coverageGap)}</span>`:''}</div></td>
  <td class="dp078-money muted">—</td><td class="dp078-money muted">—</td><td class="dp078-money muted">—</td>
  <td><button type="button" class="btn small" data-wty-edit="${esc(v.id)}" aria-label="Edit ${esc(type)} job ${esc(v.jobNumber||'')}">Edit</button></td>
  </tr>`;
 }
 function dp078Table(jobs){
  const active=jobs.filter(j=>j.status!=='Deleted');
- const moved=active.filter(j=>productionVisitRole(j).role==='rescheduled');
- const scheduled=active.filter(j=>productionVisitRole(j).role!=='rescheduled');
+ const moved=active.filter(j=>j.status==='Rescheduled'||productionVisitRole(j).role==='rescheduled');
+ const scheduled=active.filter(j=>j.status!=='Rescheduled'&&productionVisitRole(j).role!=='rescheduled');
  const open=scheduled.filter(j=>dp078Stage(j)==='open').sort((a,b)=>{
   const priority=x=>x.status==='On Hold'||x.status==='Needs Return'||x.status==='Incomplete - not Breakage'||productionHasIssue(x)?0:x.status==='In Progress'?1:2;
   return priority(a)-priority(b)||String(a.jobNumber).localeCompare(String(b.jobNumber));
@@ -3929,7 +3955,7 @@ function dp078Table(jobs){
  const sections=[
   {title:'Open Jobs',note:'Unfinished installations first',rows:open,cls:'open'},
   {title:'Other Jobs',note:`${operational.length} Warranty / OOM / Training / Shop assignments · no install revenue`,rows:operational,cls:'other'},
-  {title:'Moved / Rescheduled',note:'Prior schedule entry retained for audit · excluded from today’s production totals',rows:moved,cls:'moved'},
+  {title:'Moved / Rescheduled',note:'Rescheduled installs have no crew or expected revenue until a new date is set · moved Workflow entries stay for audit',rows:moved,cls:'moved'},
   {title:'Breakage',note:`${breaks.length} unsuccessful · ${money(revenue)} not completed`,rows:breaks,cls:'breakage'},
   {title:'Completed',note:'Finished jobs moved to the bottom',rows:finished,cls:'done'}
  ];
@@ -3944,9 +3970,9 @@ function renderDaily(){
  const stats=prodStats(dailyDate),jobs=state.productionJobs.filter(j=>j.date===dailyDate),issues=moduleDataIssues('daily',{date:dailyDate}),mtdSupported=mtdReportSupportsDate(dailyDate),closeBlocked=!!state.closeDayValidation?.[dailyDate],qf=workflowQuickFillStats();
  el.innerHTML=pageHead('Daily Production','Open jobs first · finished jobs last · protected once the workday begins.',`<button class="btn" onclick="exportSection('daily')">Export Excel</button>${dateNav('prodDate',dailyDate)}<button class="btn" id="uploadMtd">Upload MTD</button><input id="dailyMtdPicker" class="hidden-input" type="file" accept=".xlsx,.xlsm"><button class="btn" id="addWarranty">+ Warranty / OOM</button><button class="btn primary" id="addProdJob">+ Install</button><button class="btn dark" id="closeDay">Close Day</button>`)+dataConfidenceBanner(issues)+`
  <div class="grid kpi dp081-totals">
-  ${kpi('Original Confirmed',jobs.length?money(stats.confirmed):'—',`${stats.expectedJobs} scheduled · never replaced by MTD`)}
+  ${kpi('Original Confirmed',jobs.length?money(stats.confirmed):'—',`${stats.expectedJobs} active • ${stats.rescheduledJobs} rescheduled · original retained`)}
   ${kpi('Completed · MTD',mtdSupported?money(stats.actual):'—',mtdSupported?`${stats.completed} completed · ${stats.reconciled} reconciled`:'MTD required for actuals')}
-  ${kpi('Breakage',money(stats.breakage),`${stats.breakageJobs} unsuccessful · not completed`)}
+  ${kpi('Breakage / Rescheduled',money(stats.breakage+stats.rescheduled),`${stats.breakageJobs} breakage · ${stats.rescheduledJobs} rescheduled`)}
   ${kpi('Closeout',`${stats.internalCloseoutComplete}/${stats.internalCloseoutNeeded}`,`${Math.max(0,stats.internalCloseoutNeeded-stats.internalCloseoutComplete)} checklists outstanding`)}
  </div>
  <div class="dp081-guard">${productionDayStarted(dailyDate)?`<span class="status info" title="Workday job list is protected from automatic removal; updates depend on the date.">✓ Workday protected</span>`:''}${jobs.filter(j=>j.workflowRetainedFromEarlierImport).length?`<span class="status warn">${jobs.filter(j=>j.workflowRetainedFromEarlierImport).length} retained from earlier Workflow — closeout review</span>`:''}</div>
@@ -3971,8 +3997,8 @@ function renderDaily(){
 function kpi(label,value,meta){return `<div class="card kpi-card"><div class="kpi-label">${esc(label)}</div><div class="kpi-value">${esc(value)}</div><div class="kpi-meta">${esc(meta)}</div></div>`}
 function productionTable(jobs){return `<div class="table-wrap"><table class="table"><thead><tr><th>Job</th><th>Customer</th><th>Assigned Crew</th><th>Relevant Tags</th><th>Appointments</th><th>Confirmed</th><th>Status</th><th>Closeout</th><th>MTD Confirmation</th><th>Change Order</th><th>Completed</th><th>Missing / Vendor</th><th></th></tr></thead><tbody>${jobs.map(j=>{const cc=closeoutChecklistFor(j),ccDone=closeoutChecklistComplete(j),ccCount=closeoutChecklistCount(j),needs=jobNeedsInternalCloseout(j);return `<tr class="${productionJobRowType(j)||((needs&&!ccDone)||(j.mtdReconciledAt&&!j.closeoutConfirmed)?'employee-row-watch':'')}"><td class="strong">${esc(j.jobNumber)}${j.workflowRetainedFromEarlierImport?'<span class="dp-issue-flag" title="This assigned job was not on the latest Workflow report; manager closeout is still required">Retained · check closeout</span>':''}${productionHasIssue(j)?'<span class="dp-issue-flag" title="Issue note logged">Issue logged</span>':''}${dailyWorkflowVisitLabel(j)}</td><td>${esc(j.customer)}</td><td style="min-width:190px">${productionCrewHtml(j)}</td><td style="min-width:170px">${productionTagChips(j)}</td><td class="center strong">${dailyAppointmentBadge(j)}</td><td class="money">${money(j.confirmedTotal)}</td><td>${statusChip(productionStatusLabel(j.status||'Start'),productionStatusTone(j.status||'Start'))}${j.reason?`<div class="dp-reason-note" title="${esc(j.reason)}">Reason: ${esc(j.reason)}</div>`:''}${j.splitCommission5050==='Yes'?'<div class="sch065-flag">50/50 split · manager flagged</div>':''}</td><td><div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start">${ccDone?statusChip(j.status==='2 Day - Day 1 Complete'?'Day 1 of 2 closed':j.status==='Cali Day 1'?'Cali day 1 closed':productionIsBreakage(j.status)||j.status==='Incomplete - not Breakage'?'Closeout recorded':'Complete',DAY1_CLOSED_STATUSES.has(j.status)||productionIsBreakage(j.status)||j.status==='Incomplete - not Breakage'?'info':'good'):needs?statusChip(ccCount?`${ccCount}/3 complete`:'Not started',ccCount?'warn':'gray'):statusChip('Not ready','gray')}<button class="btn small ${ccDone?'':'primary'}" data-job-closeout="${j.id}">Closeout</button></div></td><td>${j.closeoutConfirmed?statusChip('Confirmed','good'):j.mtdReconciledAt?statusChip('Needs confirmation','warn'):'—'}${j.mtdJobStatus?`<div class="muted" style="font-size:8px;margin-top:3px">${esc(j.mtdJobStatus)}</div>`:''}</td><td class="money">${j.mtdReconciledAt&&Math.abs(Number(j.actualCollected||0)-Number(j.confirmedTotal||0))>.009?money(j.actualCollected-j.confirmedTotal):'—'}</td><td class="money">${j.mtdReconciledAt?money(j.actualCollected):'—'}${j.mtdReconciledAt?'<div class="muted" style="font-size:8px">MTD reconciled</div>':''}</td><td>${j.missingItems?statusChip('Missing','warn'):''} ${j.vendorIssue?statusChip('Vendor','bad'):''}</td><td><div style="display:flex;gap:5px;align-items:center"><select class="select sch065-action" data-prod065-action="${esc(j.id)}" aria-label="Quick job actions"><option value="">Quick action…</option><option value="blowout">Blowout — unsuccessful</option><option value="past5">Past 5 PM — crew late</option><option value="callout">Callout — select employee</option></select><button class="btn small" data-job-edit="${j.id}">Edit</button></div>${j.past5?'<div class="sch065-flag">Past 5 PM</div>':''}${j.calloutNames?.length?`<div class="sch065-flag">Called out: ${esc(j.calloutNames.join(', '))}</div>`:''}</td></tr>`}).join('')}</tbody></table></div>`}
 function exceptionRows(jobs){const x=jobs.filter(j=>productionIsBreakage(j.status)||j.status==='Incomplete - not Breakage'||j.missingItems||j.vendorIssue||productionHasIssue(j)||(j.mtdReconciledAt&&!j.closeoutConfirmed)||(jobNeedsInternalCloseout(j)&&!closeoutChecklistComplete(j)));return x.length?x.map(j=>{const internalMissing=jobNeedsInternalCloseout(j)&&!closeoutChecklistComplete(j),mtdMissing=!!j.mtdReconciledAt&&!j.closeoutConfirmed;let meta=internalMissing?`Internal closeout checklist incomplete (${closeoutChecklistCount(j)}/3)`:(mtdMissing?'Completed in Daily Production but not yet confirmed by MTD':esc(j.issues||j.reason||j.notes||j.missingItems||j.vendorIssue||'Exception'));if(j.reason)meta+=` • Reason: ${esc(j.reason)}`;let chip=internalMissing?statusChip('Closeout needed','warn'):mtdMissing?statusChip('Needs MTD confirmation','warn'):statusChip(productionIsBreakage(j.status)?j.status:j.status==='Incomplete - not Breakage'?'Incomplete - not Breakage':productionHasIssue(j)?'Issue logged':j.vendorIssue?'Vendor':'Missing',productionIsBreakage(j.status)||j.vendorIssue||productionHasIssue(j)?'bad':'warn');return `<div class="review-item"><div><b>#${esc(j.jobNumber)} • ${esc(j.customer)}</b><div class="meta">${meta}</div></div>${chip}</div>`}).join(''):`<div class="muted" style="font-size:11px">No exceptions recorded for this day.</div>`}
-function summaryRows(s){const u=!!s._mtdUnsupported,arr=[['Confirmed',money(s.confirmed)],['Completed',u?'—':money(s.actual)],['Closeout Checklists',`${s.internalCloseoutComplete}/${s.internalCloseoutNeeded}`],['MTD Confirmed',u?'—':`${s.closeoutConfirmed}/${s.completed}`],['Needs MTD Confirmation',u?'—':s.needsConfirmation],['Net Change Orders',u?'—':money(s.changeOrders)],['MTD Reconciled Jobs',u?'—':s.reconciled],['Incomplete',money(s.incomplete)],['Breakage',money(s.breakage)],['Missing items',s.missing],['Vendor issues',s.vendor]];return arr.map(([a,b])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eef2f4"><span class="muted">${a}</span><b>${b}</b></div>`).join('')}
-function openJobModal(id){const j=id?state.productionJobs.find(x=>x.id===id):{id:'',date:dailyDate,status:'Start',changeOrder:0,actualCollected:0,tagsRaw:'',appointmentCounter:''};openModal(id?'Edit Production Job':'Add Production Job',`<div class="form-grid"><div class="field"><label>Job #</label><input class="input" id="mJob" value="${esc(j.jobNumber||'')}"></div><div class="field"><label>Date</label><input class="input" id="mDate" type="date" value="${j.date||dailyDate}"></div><div class="field"><label>Customer</label><input class="input" id="mCustomer" value="${esc(j.customer||'')}"></div><div class="field"><label>Original Confirmed Job Total${id?' · locked':''}</label><input class="input" id="mConfirmed" type="number" step=".01" ${id?'readonly title="Original confirmed is protected after job creation"':''} value="${Number(j.confirmedTotal||0)}"></div><div class="field"><label>Status</label><select class="select" id="mStatus">${PROD_STATUSES.map(x=>`<option ${x===j.status?'selected':''}>${x}</option>`).join('')}${j.status&&!PROD_STATUSES.includes(j.status)?`<option value="${esc(j.status)}" selected hidden>Legacy: ${esc(j.status)}</option>`:''}</select><div class="muted" style="font-size:9px;margin-top:4px">Day 1 of 2 closed means the crew returns tomorrow. The job is not counted as fully completed.</div></div><div id="prodReasonWrap" class="field dp-reason-field"><label for="mReason">Reason for incomplete / breakage (required)</label><input class="input" id="mReason" value="${esc(j.reason||'')}" placeholder="Explain why the job did not finish as planned"><div class="dp-error" id="prodReasonError">A reason is required before saving this status.</div></div><div class="field"><label>Appointment Counter (1–4)</label><select class="select" id="mCounter"><option value="">—</option>${[1,2,3,4].map(x=>`<option value="${x}" ${String(j.appointmentCounter||'')===String(x)?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>Change Order (MTD difference only)</label><input class="input" id="mCO" type="number" step=".01" readonly value="${j.mtdReconciledAt&&COMPLETED_STATUSES.has(j.status)&&!productionIsBreakage(j.status)?Number(j.actualCollected||0)-Number(j.confirmedTotal||0):0}"></div><div class="field"><label>Completed Revenue (from MTD)</label><input class="input" id="mActual" type="text" readonly value="${j.mtdReconciledAt?money(j.actualCollected||0):'Awaiting MTD'}"></div><div class="field"><label>Incomplete $</label><input class="input" id="mIncomplete" type="number" step=".01" value="${Number(j.incomplete||0)}"></div><div class="field" style="grid-column:1/-1"><label>Assigned Crew</label><input class="input" id="mInstallers" value="${esc(j.installers||'')}"></div><div class="field" style="grid-column:1/-1"><label>ServiceTitan Tags</label><input class="input" id="mTags" value="${esc(j.tagsRaw||'')}" placeholder="Only 2 Day, Premium, Tier 1/2/3, Cali Door, BRKG and counter 1–4 display on the table"></div><div class="field"><label>Missing Items</label><input class="input" id="mMissing" value="${esc(j.missingItems||'')}"></div><div class="field"><label>Vendor Error / Near Miss</label><input class="input" id="mVendor" value="${esc(j.vendorIssue||'')}"></div><div class="field dp-issue-field" style="grid-column:1/-1"><label for="mIssues">⚑ Issues — record job problems (flags the job)</label><textarea class="textarea" id="mIssues" placeholder="Reordered materials, customer concern, damage claim, missing material, etc.">${esc(j.issues||'')}</textarea><small>Leave blank if there are no issues. Any text here flags the job and adds it to the Issues & Breakage Tracker. General job notes remain separate.</small></div><div class="field" style="grid-column:1/-1"><label>Notes</label><textarea class="textarea" id="mNotes">${esc(j.notes||'')}</textarea></div></div>`,`<button class="btn" id="modalCancel">Cancel</button>${id?'<button class="btn danger" id="deleteJob">Delete record</button>':''}<button class="btn primary" id="saveJob">Save</button>`);$('#modalCancel').onclick=closeModal;const reasonWrap=$('#prodReasonWrap'),reasonInput=$('#mReason');function syncReasonRequired(){const required=productionRequiresReason($('#mStatus').value);reasonWrap.classList.toggle('visible',required);reasonWrap.classList.remove('invalid');reasonInput.required=required;reasonInput.setAttribute('aria-required',String(required));}$('#mStatus').addEventListener('change',syncReasonRequired);reasonInput.addEventListener('input',()=>reasonWrap.classList.remove('invalid'));syncReasonRequired();$('#saveJob').onclick=()=>{const st=$('#mStatus').value;if(COMPLETED_STATUSES.has(st)&&!COMPLETED_STATUSES.has(j.status)&&!confirm('Confirm that this installation is actually finished? Only the MTD report supplies completed revenue.'))return;if(productionRequiresReason(st)&&!reasonInput.value.trim()){reasonWrap.classList.add('invalid');reasonInput.focus();toast('Enter a reason before saving this job');return;}const tagsRaw=$('#mTags').value.trim(),info=productionTagInfo(tagsRaw);const obj={id:id||uid('job'),date:$('#mDate').value,jobNumber:$('#mJob').value.trim(),customer:$('#mCustomer').value.trim(),confirmedTotal:id?Number(j.confirmedTotal||0):Number($('#mConfirmed').value||0),status:st,changeOrder:id?Number(j.changeOrder||0):0,actualCollected:id?Number(j.actualCollected||0):0,incomplete:Number($('#mIncomplete').value||0),installers:$('#mInstallers').value.trim(),tagsRaw,relevantTags:info.tags,appointmentCounter:$('#mCounter').value||info.appointmentCounter||'',missingItems:$('#mMissing').value.trim(),vendorIssue:$('#mVendor').value.trim(),reason:reasonInput.value.trim(),issues:$('#mIssues').value.trim(),issueUpdatedAt:$('#mIssues').value.trim()!==String(j.issues||'').trim()?new Date().toISOString():(j.issueUpdatedAt||''),issueCrewSnapshot:$('#mIssues').value.trim()?($('#mIssues').value.trim()===String(j.issues||'').trim()?(j.issueCrewSnapshot||$('#mInstallers').value.trim()):$('#mInstallers').value.trim()):'',notes:$('#mNotes').value.trim(),past5:!!j.past5,calloutNames:j.calloutNames||[],splitCommission5050:j.splitCommission5050||'',workflowTwoDayFirstVisit:!!j.workflowTwoDayFirstVisit,closed:j.closed||false,source:j.source||'Manual',mtdReconciledAt:j.mtdReconciledAt||'',mtdSource:j.mtdSource||'',completionDate:j.completionDate||'',mtdJobStatus:j.mtdJobStatus||'',closeoutConfirmed:!!j.closeoutConfirmed,closeoutConfirmedAt:j.closeoutConfirmedAt||'',closeoutChecklist:closeoutChecklistFor(j)};/* Completed revenue is MTD-only; status changes never fill actualCollected. */if(!COMPLETED_STATUSES.has(st))obj.closed=false;if(INCOMPLETE_AUTO.has(st)&&!obj.incomplete)obj.incomplete=obj.confirmedTotal;if(!id&&state.productionJobs.some(x=>productionWorkflowKey(x.date,x.jobNumber)===productionWorkflowKey(obj.date,obj.jobNumber))){toast('This job is already on the board for that date. Edit the existing row instead.');return;}if(id){if(productionWorkflowKey(j.date,j.jobNumber)!==productionWorkflowKey(obj.date,obj.jobNumber))productionRememberManualRemoval(j.date,j.jobNumber);const managerOverride=!!j.workflowManagerOverride||String(j.installers||'')!==obj.installers||String(j.tagsRaw||'')!==obj.tagsRaw;Object.assign(j,obj);if(managerOverride)j.workflowManagerOverride=true}else state.productionJobs.push(obj);productionAllowManualJob(obj.date,obj.jobNumber);audit(id?'Production job edited':'Production job added',`#${obj.jobNumber}`,`${obj.date} • ${obj.status}`);dailyDate=obj.date;closeModal();saveSoon();renderDaily()};if(id)$('#deleteJob').onclick=()=>{if(!confirm('Remove job #'+j.jobNumber+' from '+j.date+'? This is a manual deletion and Workflow imports will not restore it automatically.'))return;productionRememberManualRemoval(j.date,j.jobNumber);state.productionJobs=state.productionJobs.filter(x=>x.id!==id);audit('Production job deleted',`#${j.jobNumber}`,j.date);closeModal();saveSoon();renderDaily()}}
+function summaryRows(s){const u=!!s._mtdUnsupported,arr=[['Confirmed',money(s.confirmed)],['Completed',u?'—':money(s.actual)],['Closeout Checklists',`${s.internalCloseoutComplete}/${s.internalCloseoutNeeded}`],['MTD Confirmed',u?'—':`${s.closeoutConfirmed}/${s.completed}`],['Needs MTD Confirmation',u?'—':s.needsConfirmation],['Net Change Orders',u?'—':money(s.changeOrders)],['MTD Reconciled Jobs',u?'—':s.reconciled],['Incomplete',money(s.incomplete)],['Breakage',money(s.breakage)],['Rescheduled',money(s.rescheduled||0)],['Missing items',s.missing],['Vendor issues',s.vendor]];return arr.map(([a,b])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eef2f4"><span class="muted">${a}</span><b>${b}</b></div>`).join('')}
+function openJobModal(id){const j=id?state.productionJobs.find(x=>x.id===id):{id:'',date:dailyDate,status:'Start',changeOrder:0,actualCollected:0,tagsRaw:'',appointmentCounter:''};openModal(id?'Edit Production Job':'Add Production Job',`<div class="form-grid"><div class="field"><label>Job #</label><input class="input" id="mJob" value="${esc(j.jobNumber||'')}"></div><div class="field"><label>Date</label><input class="input" id="mDate" type="date" value="${j.date||dailyDate}"></div><div class="field"><label>Customer</label><input class="input" id="mCustomer" value="${esc(j.customer||'')}"></div><div class="field"><label>Original Confirmed Job Total${id?' · locked':''}</label><input class="input" id="mConfirmed" type="number" step=".01" ${id?'readonly title="Original confirmed is protected after job creation"':''} value="${Number(j.confirmedTotal||0)}"></div><div class="field"><label>Status</label><select class="select" id="mStatus">${PROD_STATUSES.map(x=>`<option ${x===j.status?'selected':''}>${x}</option>`).join('')}${j.status&&!PROD_STATUSES.includes(j.status)?`<option value="${esc(j.status)}" selected hidden>Legacy: ${esc(j.status)}</option>`:''}</select><div class="muted" style="font-size:9px;margin-top:4px">Day 1 of 2 closed means the crew returns tomorrow. The job is not counted as fully completed.</div></div><div id="prodReasonWrap" class="field dp-reason-field"><label for="mReason">Reason for incomplete / breakage (required)</label><input class="input" id="mReason" value="${esc(j.reason||'')}" placeholder="Explain why the job did not finish as planned"><div class="dp-error" id="prodReasonError">A reason is required before saving this status.</div></div><div class="field"><label>Appointment Counter (1–4)</label><select class="select" id="mCounter"><option value="">—</option>${[1,2,3,4].map(x=>`<option value="${x}" ${String(j.appointmentCounter||'')===String(x)?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>Change Order (MTD difference only)</label><input class="input" id="mCO" type="number" step=".01" readonly value="${j.mtdReconciledAt&&COMPLETED_STATUSES.has(j.status)&&!productionIsBreakage(j.status)?Number(j.actualCollected||0)-Number(j.confirmedTotal||0):0}"></div><div class="field"><label>Completed Revenue (from MTD)</label><input class="input" id="mActual" type="text" readonly value="${j.mtdReconciledAt?money(j.actualCollected||0):'Awaiting MTD'}"></div><div class="field"><label>Incomplete $</label><input class="input" id="mIncomplete" type="number" step=".01" value="${Number(j.incomplete||0)}"></div><div class="field" style="grid-column:1/-1"><label>Assigned Crew</label><input class="input" id="mInstallers" value="${esc(j.installers||'')}"></div><div class="field" style="grid-column:1/-1"><label>ServiceTitan Tags</label><input class="input" id="mTags" value="${esc(j.tagsRaw||'')}" placeholder="Only 2 Day, Premium, Tier 1/2/3, Cali Door, BRKG and counter 1–4 display on the table"></div><div class="field"><label>Missing Items</label><input class="input" id="mMissing" value="${esc(j.missingItems||'')}"></div><div class="field"><label>Vendor Error / Near Miss</label><input class="input" id="mVendor" value="${esc(j.vendorIssue||'')}"></div><div class="field dp-issue-field" style="grid-column:1/-1"><label for="mIssues">⚑ Issues — record job problems (flags the job)</label><textarea class="textarea" id="mIssues" placeholder="Reordered materials, customer concern, damage claim, missing material, etc.">${esc(j.issues||'')}</textarea><small>Leave blank if there are no issues. Any text here flags the job and adds it to the Issues & Breakage Tracker. General job notes remain separate.</small></div><div class="field" style="grid-column:1/-1"><label>Notes</label><textarea class="textarea" id="mNotes">${esc(j.notes||'')}</textarea></div></div>`,`<button class="btn" id="modalCancel">Cancel</button>${id?'<button class="btn danger" id="deleteJob">Delete record</button>':''}<button class="btn primary" id="saveJob">Save</button>`);$('#modalCancel').onclick=closeModal;const reasonWrap=$('#prodReasonWrap'),reasonInput=$('#mReason');function syncReasonRequired(){const required=productionRequiresReason($('#mStatus').value);reasonWrap.classList.toggle('visible',required);reasonWrap.classList.remove('invalid');reasonInput.required=required;reasonInput.setAttribute('aria-required',String(required));}$('#mStatus').addEventListener('change',syncReasonRequired);reasonInput.addEventListener('input',()=>reasonWrap.classList.remove('invalid'));syncReasonRequired();$('#saveJob').onclick=()=>{const st=$('#mStatus').value;if(COMPLETED_STATUSES.has(st)&&!COMPLETED_STATUSES.has(j.status)&&!confirm('Confirm that this installation is actually finished? Only the MTD report supplies completed revenue.'))return;if(productionRequiresReason(st)&&!reasonInput.value.trim()){reasonWrap.classList.add('invalid');reasonInput.focus();toast('Enter a reason before saving this job');return;}const tagsRaw=$('#mTags').value.trim(),info=productionTagInfo(tagsRaw);const obj={id:id||uid('job'),date:$('#mDate').value,jobNumber:$('#mJob').value.trim(),customer:$('#mCustomer').value.trim(),confirmedTotal:id?Number(j.confirmedTotal||0):Number($('#mConfirmed').value||0),status:st,changeOrder:id?Number(j.changeOrder||0):0,actualCollected:id?Number(j.actualCollected||0):0,incomplete:Number($('#mIncomplete').value||0),installers:st==='Rescheduled'?'':$('#mInstallers').value.trim(),tagsRaw,relevantTags:info.tags,appointmentCounter:$('#mCounter').value||info.appointmentCounter||'',missingItems:$('#mMissing').value.trim(),vendorIssue:$('#mVendor').value.trim(),reason:reasonInput.value.trim(),issues:$('#mIssues').value.trim(),issueUpdatedAt:$('#mIssues').value.trim()!==String(j.issues||'').trim()?new Date().toISOString():(j.issueUpdatedAt||''),issueCrewSnapshot:$('#mIssues').value.trim()?($('#mIssues').value.trim()===String(j.issues||'').trim()?(j.issueCrewSnapshot||$('#mInstallers').value.trim()):$('#mInstallers').value.trim()):'',notes:$('#mNotes').value.trim(),past5:!!j.past5,calloutNames:j.calloutNames||[],splitCommission5050:j.splitCommission5050||'',workflowTwoDayFirstVisit:!!j.workflowTwoDayFirstVisit,closed:j.closed||false,source:j.source||'Manual',mtdReconciledAt:j.mtdReconciledAt||'',mtdSource:j.mtdSource||'',completionDate:j.completionDate||'',mtdJobStatus:j.mtdJobStatus||'',closeoutConfirmed:!!j.closeoutConfirmed,closeoutConfirmedAt:j.closeoutConfirmedAt||'',closeoutChecklist:closeoutChecklistFor(j)};/* Completed revenue is MTD-only; status changes never fill actualCollected. */if(!COMPLETED_STATUSES.has(st))obj.closed=false;if(INCOMPLETE_AUTO.has(st)&&!obj.incomplete)obj.incomplete=obj.confirmedTotal;if(!id&&state.productionJobs.some(x=>productionWorkflowKey(x.date,x.jobNumber)===productionWorkflowKey(obj.date,obj.jobNumber))){toast('This job is already on the board for that date. Edit the existing row instead.');return;}if(id){if(st==='Rescheduled'&&j.status!=='Rescheduled'){j.preRescheduleCrew=j.installers;j.preRescheduleStatus=j.status;j.crewManagerOverride=true;j.rescheduledAt=new Date().toISOString();}if(productionWorkflowKey(j.date,j.jobNumber)!==productionWorkflowKey(obj.date,obj.jobNumber))productionRememberManualRemoval(j.date,j.jobNumber);const managerOverride=!!j.workflowManagerOverride||String(j.installers||'')!==obj.installers||String(j.tagsRaw||'')!==obj.tagsRaw;Object.assign(j,obj);if(managerOverride)j.workflowManagerOverride=true}else state.productionJobs.push(obj);productionAllowManualJob(obj.date,obj.jobNumber);audit(id?'Production job edited':'Production job added',`#${obj.jobNumber}`,`${obj.date} • ${obj.status}`);dailyDate=obj.date;closeModal();saveSoon();renderDaily()};if(id)$('#deleteJob').onclick=()=>{if(!confirm('Remove job #'+j.jobNumber+' from '+j.date+'? This is a manual deletion and Workflow imports will not restore it automatically.'))return;productionRememberManualRemoval(j.date,j.jobNumber);state.productionJobs=state.productionJobs.filter(x=>x.id!==id);audit('Production job deleted',`#${j.jobNumber}`,j.date);closeModal();saveSoon();renderDaily()}}
 function openCloseoutModal(id){const j=state.productionJobs.find(x=>x.id===id);if(!j)return;if(!COMPLETED_STATUSES.has(j.status)){toast('Finish the installation before its final job closeout');return;}const c=closeoutChecklistFor(j),done=closeoutChecklistComplete(j);openModal(`Job #${esc(j.jobNumber)} Closeout`,`<div class="alert ${j.status==='Start'?'warn':'info'}"><b>Status:</b> ${esc(productionStatusLabel(j.status||'Start'))} • ${esc(j.customer||'')}${j.status==='Start'?'<br>Set the job status before finalizing the closeout checklist.':''}</div><div class="rule-box" style="margin-top:12px">Use <b>All Confirmed</b> when every closeout requirement has been verified. Selecting it automatically checks Required Photos, Required Materials, and Payment Verified.</div><div style="display:grid;gap:10px;margin-top:14px"><label class="report-card" style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="coAll" ${c.allConfirmed?'checked':''}><div><b>All Confirmed</b><div class="muted" style="font-size:10px">Check all closeout requirements at once</div></div></label><label class="report-card" style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="coPhotos" ${c.requiredPhotos?'checked':''}><b>Required Photos</b></label><label class="report-card" style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="coMaterials" ${c.requiredMaterials?'checked':''}><b>Required Materials</b></label><label class="report-card" style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="coPayment" ${c.paymentVerified?'checked':''}><b>Payment Verified</b></label></div>${done&&c.completedAt?`<div class="muted" style="font-size:10px;margin-top:12px">Last completed: ${new Date(c.completedAt).toLocaleString()}</div>`:''}`,`<button class="btn" id="modalCancel">Cancel</button><button class="btn primary" id="saveCloseout">Save Closeout</button>`);$('#modalCancel').onclick=closeModal;const master=$('#coAll'),kids=[$('#coPhotos'),$('#coMaterials'),$('#coPayment')];master.onchange=()=>{if(master.checked)kids.forEach(x=>x.checked=true)};kids.forEach(k=>k.onchange=()=>{if(!k.checked)master.checked=false;else if(kids.every(x=>x.checked))master.checked=true});$('#saveCloseout').onclick=()=>{const requiredPhotos=$('#coPhotos').checked,requiredMaterials=$('#coMaterials').checked,paymentVerified=$('#coPayment').checked,allConfirmed=$('#coAll').checked||(requiredPhotos&&requiredMaterials&&paymentVerified),isComplete=requiredPhotos&&requiredMaterials&&paymentVerified,wasComplete=closeoutChecklistComplete(j);j.closeoutChecklist={allConfirmed,requiredPhotos,requiredMaterials,paymentVerified,completedAt:isComplete?(c.completedAt||new Date().toISOString()):''};j.closed=isComplete; // Sync the explicit closeout state for the Done badge
 audit(isComplete?'Job closeout completed':'Job closeout updated',`#${j.jobNumber}`,`${j.date} • ${j.status} • Photos ${requiredPhotos?'Yes':'No'} • Materials ${requiredMaterials?'Yes':'No'} • Payment ${paymentVerified?'Yes':'No'}${wasComplete&&!isComplete?' • Reopened':''}`);closeModal();saveSoon();renderDaily()}}
 function closeProductionDay(date){
@@ -5850,6 +5876,7 @@ function schedulerWorkflowJobsForDay(date){
   if(!capacityWorkflowEligible(w)||!capacityWorkflowDates(w).includes(date))continue;
   const jobNumber=String(workflowValue(w,[/^job\s*#$/i,/job number/i])||'').trim();
   if(!jobNumber)continue;
+  if((state.productionJobs||[]).some(j=>j.date===date&&String(j.jobNumber)===jobNumber&&j.status==='Rescheduled'))continue;
   found.set(jobNumber,{jobNumber,customer:String(workflowValue(w,[/^customer name$/i,/^customer$/i])||''),tags:String(workflowValue(w,[/^job tags?$/i,/^tags?$/i])||''),status:String(workflowValue(w,[/^job status$/i])||''),address:String(workflowValue(w,[/^customer address$/i,/^job address$/i,/^service address$/i])||'')});
  }
  return [...found.values()].sort((a,b)=>a.jobNumber.localeCompare(b.jobNumber));
@@ -5937,7 +5964,7 @@ function schedulerKnownJobs(start,end){
   if(bu&&!isPHLBathBusinessUnit(bu))continue;
   if(!/^(?:start|scheduled)$/i.test(st))continue;
   const id=String(workflowValue(w,[/^job\s*#$/i,/job number/i])||'').trim();if(!id)continue;
-  let dates=capacityWorkflowDates(w).filter(d=>d>=start&&d<=end&&schedulerDayAllowed(d));
+  let dates=capacityWorkflowDates(w).filter(d=>d>=start&&d<=end&&schedulerDayAllowed(d)&&!(state.productionJobs||[]).some(j=>j.date===d&&String(j.jobNumber)===id&&j.status==='Rescheduled'));
   const rawTags=String(workflowValue(w,[/^job tags?$/i,/^tags?$/i,/^tag names?$/i])||'');
   const address=String(workflowValue(w,[/^customer address$/i,/^job address$/i,/^location address$/i,/^service address$/i])||'').trim();
   const zip=schedulerZip(workflowValue(w,[/^location zip$/i,/^job zip$/i,/^zip code$/i,/^postal code$/i,/address.*zip/i]))||schedulerZip(address);
@@ -6401,6 +6428,145 @@ function schedulerAssignShop(){
  for(const n of free){state.warrantyVisits.push({id:uid('wty'),date:day,jobNumber:`SHOP-${day}-${n.replace(/[^A-Za-z0-9]/g,'').slice(0,12)}`,category:'Shop',type:'Shop day',employees:[n],usesCapacity:false,notes:'Scheduler: unassigned Apprentice assigned to shop; manager confirmed',createdAt:new Date().toISOString()})}
  schedulerData().shopSuggestions=[];audit('Shop day assignments',day,`${free.join(', ')} · manager approved`);saveSoon();renderRecommendedScheduler();toast(`${free.length} shop days recorded in Daily Production`);
 }
+// v0.84 — callouts are resolved on the job board, not just flagged for scheduler review.
+// A replacement is assigned to exactly one job. If pulled from another install,
+// that source job is left on the board with an explicit crew-gap warning.
+function dp084OnJobNames(j){return [...new Set(schedulerAssignedFromText(j?.installers||'').map(canonicalRosterName))]}
+function dp084ReplaceName(list,oldName,newName){return list.map(n=>canonicalRosterName(n)===oldName?newName:n).filter(Boolean).filter((n,i,a)=>a.indexOf(n)===i)}
+function dp084ReplacementOptions(job,called){
+ const date=job.date,needed=schedulerRole(called,date),off=new Set(schedulerEmployeeOff(date).map(e=>canonicalRosterName(e.employee))),onTarget=new Set(dp084OnJobNames(job)),out=[];
+ if(!needed)return out;
+ for(const emp of activeEmployees(date)){
+  const name=emp.name,role=schedulerRole(name,date);
+  if(!['lead','support'].includes(role)||name===called||onTarget.has(name)||off.has(name))continue;
+  // A Lead can cover a support absence on a two-Lead crew, but requires split review.
+  if(!(role===needed||(needed==='support'&&role==='lead')))continue;
+  const jobs=(state.productionJobs||[]).filter(j=>j.date===date&&j.id!==job.id&&j.status!=='Deleted'&&j.status!=='Rescheduled'&&productionVisitRole(j).role!=='rescheduled'&&dp084OnJobNames(j).includes(name));
+  const other=(state.warrantyVisits||[]).filter(v=>v.date===date&&warrantyAssigneeNames(v).includes(name));
+  if(other.length>1||(other.length&&jobs.length)||jobs.length>1||jobs.some(j=>j.closed||COMPLETED_STATUSES.has(j.status)))continue;
+  const source=jobs[0]||null,operational=other[0]||null;
+  // A draft schedule is not a second physical assignment, but will be synced on save.
+  const plans=(schedulerData().recommendations||[]).filter(r=>r.date===date&&String(r.jobNumber)!==String(job.jobNumber)&&schedulerPlanNames(r).includes(name));
+  const saved=(schedulerData().saved||[]).filter(r=>r.date===date&&String(r.jobNumber)!==String(job.jobNumber)&&schedulerPlanNames(r).includes(name));
+  if(!source&&(plans.length>1||saved.length>1))continue;
+  const fromJob=source?.jobNumber||operational?.jobNumber||plans[0]?.jobNumber||saved[0]?.jobNumber||'';
+  out.push({name,role,fromId:source?.id||operational?.id||'',fromJob,fromType:source?'install':operational?'other':fromJob?'scheduler':'available'});
+ }
+ return out.sort((a,b)=>Number(!!a.fromJob)-Number(!!b.fromJob)||a.name.localeCompare(b.name));
+}
+function dp084SyncSchedulerForCallout(date,jobNumber,called,replacement,fromJob=''){
+ const data=schedulerData();
+ for(const list of [data.recommendations||[],data.saved||[]])for(const r of list){
+  if(r.date!==date)continue;
+  const names=schedulerPlanNames(r);
+  if(String(r.jobNumber)===String(jobNumber)){
+   if(replacement){
+    if(r.lead===called)r.lead=replacement;
+    if(r.support===called){
+     if(schedulerRole(replacement,date)==='lead'){r.support='';r.extraCrew=[...(r.extraCrew||[]),replacement];r.splitCommission5050=(state.productionJobs||[]).find(j=>j.date===date&&String(j.jobNumber)===String(jobNumber))?.splitCommission5050||'';}
+     else r.support=replacement;
+    }
+    r.extraCrew=(r.extraCrew||[]).map(n=>n===called?replacement:n).filter((n,i,a)=>a.indexOf(n)===i);
+   }else{if(r.lead===called)r.lead='';if(r.support===called)r.support='';r.extraCrew=(r.extraCrew||[]).filter(n=>n!==called)}
+   r.calloutCovered=replacement?called:'';r.manuallyEdited=true;r.reviewStatus=replacement?'Pending':'Needs change';
+   r.reason=`Callout: ${called}${replacement?' replaced by '+replacement:' — job rescheduled'}. Confirm schedule in ServiceTitan.`;
+  }else if(replacement&&names.includes(replacement)){
+   if(r.lead===replacement)r.lead='';if(r.support===replacement)r.support='';r.extraCrew=(r.extraCrew||[]).filter(n=>n!==replacement);
+   r.manuallyEdited=true;r.reviewStatus='Needs change';r.reason=`${replacement} moved to install #${jobNumber}; replacement coverage needed.`;
+  }
+ }
+ if(Array.isArray(data.decisions))data.decisions.push({jobNumber:String(jobNumber),date,reviewStatus:replacement?'Callout covered':'Rescheduled — callout',lead:'',support:'',at:new Date().toISOString()});
+}
+function dp084RecordAttendance(j,called,notes){
+ j.calloutNames=[...new Set([...(j.calloutNames||[]),called])];
+ const existing=(state.callouts||[]).find(x=>x.date===j.date&&canonicalRosterName(x.employee)===called&&x.source==='Daily Production');
+ if(!existing)state.callouts.push({id:uid('co'),employee:called,date:j.date,ptoAvailable:null,source:'Daily Production',attendanceOnly:true,notes:`Job #${j.jobNumber} · ${notes}`});
+ else if(notes&&!String(existing.notes||'').includes(notes))existing.notes=[existing.notes,notes].filter(Boolean).join(' · ');
+}
+function dp084CommitCallout(id,called,mode,replacement='',notes='',split=''){
+ const j=state.productionJobs.find(x=>x.id===id);if(!j)throw Error('Job no longer exists');
+ if(!dp084OnJobNames(j).includes(called))throw Error('That employee is no longer assigned to this job. Reopen the callout panel.');
+ if(mode==='replace'){
+  const selected=dp084ReplacementOptions(j,called).find(x=>x.name===replacement);
+  if(!selected)throw Error('Replacement is no longer available or has another conflicting assignment.');
+  if(selected.role==='lead'&&schedulerRole(called,j.date)==='support'&&!['Yes','No'].includes(split))throw Error('Two Lead installers require a 50/50 commission decision.');
+  if(selected.fromId){
+   if(selected.fromType==='install'){
+    const from=state.productionJobs.find(x=>x.id===selected.fromId);
+    if(!from)throw Error('Original job is no longer available');
+    from.installers=dp084OnJobNames(from).filter(n=>n!==replacement).join(', ');
+    from.crewManagerOverride=true;
+    from.crewGapNote=`${replacement} moved to #${j.jobNumber} to cover ${called}`;
+    from.crewGapUpdatedAt=new Date().toISOString();
+   }else if(selected.fromType==='other'){
+    const from=state.warrantyVisits.find(x=>x.id===selected.fromId);
+    if(!from)throw Error('Original operational job no longer exists');
+    from.employees=warrantyAssigneeNames(from).filter(n=>n!==replacement);
+    from.coverageGap=`${replacement} moved to install #${j.jobNumber}`;
+    from.notes=[from.notes,from.coverageGap+'; replacement may be needed'].filter(Boolean).join(' · ');
+   }
+  }
+  j.installers=dp084ReplaceName(dp084OnJobNames(j),called,replacement).join(', ');
+  j.crewManagerOverride=true;
+  j.calloutReplacements=[...(j.calloutReplacements||[]).filter(x=>x.called!==called),{called,replacement,fromJob:selected.fromJob||'',at:new Date().toISOString()}];
+  if(selected.role==='lead'&&schedulerRole(called,j.date)==='support')j.splitCommission5050=split;
+  dp084SyncSchedulerForCallout(j.date,j.jobNumber,called,replacement,selected.fromJob);
+  dp084RecordAttendance(j,called,notes);
+  audit('Callout covered with replacement',`#${j.jobNumber}`,`${j.date} • ${called} → ${replacement}${selected.fromJob?' • transferred from #'+selected.fromJob:''}${split?' • two-Lead 50/50 '+split:''}`);
+ }else if(mode==='reschedule'){
+  const allCrew=dp084OnJobNames(j);
+  j.preRescheduleStatus=j.status;
+  j.preRescheduleCrew=j.installers;
+  j.status='Rescheduled';j.reason=notes||`Rescheduled due to ${called} calling out; no replacement available`;
+  j.installers='';j.closed=false;j.crewManagerOverride=true;
+  j.calloutResolution='Rescheduled — no coverage';j.rescheduledAt=new Date().toISOString();
+  j.incomplete=0;
+  for(const sibling of (state.productionJobs||[]))if(sibling.id!==j.id&&String(sibling.jobNumber)===String(j.jobNumber)&&sibling.date>=todayISO()&&sibling.status!=='Deleted'&&!COMPLETED_STATUSES.has(sibling.status)){sibling.preRescheduleStatus=sibling.status;sibling.preRescheduleCrew=sibling.installers;sibling.status='Rescheduled';sibling.installers='';sibling.crewManagerOverride=true;sibling.reason=j.reason;sibling.rescheduledAt=j.rescheduledAt;}
+  dp084SyncSchedulerForCallout(j.date,j.jobNumber,called,'');
+  // Mark every now-released crew member in draft as unassigned for this job.
+  const data=schedulerData();for(const list of [data.recommendations||[],data.saved||[]])for(const r of list)if(r.date>=todayISO()&&String(r.jobNumber)===String(j.jobNumber)){r.lead='';r.support='';r.extraCrew=[];r.reviewStatus='Needs change';r.reason='Rescheduled due to callout — removed from this installation; find new install date.'}
+  dp084RecordAttendance(j,called,notes);
+  audit('Job rescheduled — no callout coverage',`#${j.jobNumber}`,`${j.date} • ${called} • original crew ${allCrew.join(', ')} • ${j.reason}`);
+ }else throw Error('Select replacement or reschedule');
+ // Explicit manager action modifies today or a past protected workday; automated imports cannot undo it.
+ rebuildCapacityCrewHistory();saveSoon();if(currentView==='daily')renderDaily();else if(currentView==='recommended')renderRecommendedScheduler();else renderDaily();
+ return j;
+}
+function openDailyCalloutResolution(id,preselect=''){
+ const j=state.productionJobs.find(x=>x.id===id);if(!j)return;
+ const crew=dp084OnJobNames(j);if(!crew.length){toast('No assigned employees to call out');return}
+ openModal(`Callout / crew coverage · #${esc(j.jobNumber)}`,`<div class="dp084-callout">
+ <div class="rule-box"><b>${esc(j.customer||'Customer not listed')}</b> · ${esc(shortDate(j.date))}<div class="muted" style="margin-top:5px">Assigned crew: ${esc(crew.join(' + '))}</div></div>
+ <div class="field"><label>Who called out?</label><select class="select" id="dp084Who">${crew.map(n=>`<option value="${esc(n)}" ${n===preselect?'selected':''}>${esc(n)}</option>`).join('')}</select></div>
+ <div class="field"><label>How are we handling this job?</label><select class="select" id="dp084Mode"><option value="replace">Assign a replacement employee</option><option value="reschedule">Rescheduled — no crew available, lose today's install</option></select></div>
+ <div id="dp084ReplacePane"><div class="field"><label>Replacement installer</label><select class="select" id="dp084Person"></select><div class="muted" id="dp084Hint"></div></div><div class="field" id="dp084SplitWrap" style="display:none"><label>Two Leads on one job · commission split decision</label><select class="select" id="dp084Split"><option value="">Choose Yes / No</option><option value="Yes">Yes — 50/50 split</option><option value="No">No — not a 50/50 split</option></select></div></div>
+ <div class="alert warn" id="dp084ReschedulePane" style="display:none">This will mark the job <b>Rescheduled</b>, remove it from expected revenue and free the assigned crew for the day. The original confirmed amount is retained for audit.</div>
+ <div class="field"><label>Manager note / reason${' (required if rescheduled)'}</label><textarea class="textarea" rows="2" id="dp084Notes" placeholder="Reason, coverage plans, customer contact…"></textarea></div>
+ <div class="dp077-error" id="dp084Error" role="alert"></div>
+ <p class="sp-help">Moves update the local Daily Production board, staffing and capacity. If you borrow someone from another job, that job is flagged <b>Needs crew</b>. Update ServiceTitan separately.</p>
+ </div>`,`<button class="btn" id="dp084Cancel">Cancel</button><button class="btn primary" id="dp084Save">Apply callout action</button>`);
+ let choices=[];
+ const refresh=()=>{
+  const called=$('#dp084Who').value,mode=$('#dp084Mode').value,needs=schedulerRole(called,j.date);
+  $('#dp084ReplacePane').style.display=mode==='replace'?'block':'none';$('#dp084ReschedulePane').style.display=mode==='reschedule'?'block':'none';
+  if(mode!=='replace')return;
+  choices=dp084ReplacementOptions(j,called);
+  $('#dp084Person').innerHTML='<option value="">Select a replacement…</option>'+choices.map(x=>`<option value="${esc(x.name)}">${esc(x.name)}${x.fromJob?' — move from #'+esc(x.fromJob):' — unassigned'}${x.role==='lead'&&needs==='support'?' · Lead covering support':''}</option>`).join('');
+  $('#dp084Hint').textContent=choices.some(x=>x.fromJob)?'Moving a person from another job removes them there and flags that job for coverage.':'Only available, eligible employees are shown.';
+  if(!choices.length)$('#dp084Hint').textContent='No available replacement found. Select Rescheduled above, or review job assignments.';
+  $('#dp084SplitWrap').style.display='none';
+ };
+ $('#dp084Who').onchange=refresh;$('#dp084Mode').onchange=refresh;
+ $('#dp084Person').onchange=()=>{const x=choices.find(o=>o.name===$('#dp084Person').value),needed=schedulerRole($('#dp084Who').value,j.date);$('#dp084SplitWrap').style.display=x?.role==='lead'&&needed==='support'?'block':'none'};
+ $('#dp084Cancel').onclick=closeModal;
+ $('#dp084Save').onclick=()=>{
+  const called=$('#dp084Who').value,mode=$('#dp084Mode').value,replacement=$('#dp084Person').value,notes=$('#dp084Notes').value.trim(),split=$('#dp084Split').value;
+  if(mode==='reschedule'&&!notes){$('#dp084Error').textContent='Enter the reason the job must be rescheduled.';return}
+  try{dp084CommitCallout(id,called,mode,replacement,notes,split);closeModal();toast(mode==='reschedule'?`Job #${j.jobNumber} rescheduled — removed from expected production`:`${called} replaced by ${replacement} on job #${j.jobNumber}`)}catch(err){$('#dp084Error').textContent=String(err?.message||err)}
+ };
+ refresh();
+}
+
 function dailyProductionQuickAction(id,action){
  if(!action)return;
  const j=state.productionJobs.find(x=>x.id===id);if(!j)return;
@@ -6420,13 +6586,7 @@ function dailyProductionQuickAction(id,action){
  }
  if(action==='callout'){
   if(!crew.length){toast('Assign the crew before selecting a callout');return}
-  openModal('Assigned employee called out',`<p><b>#${esc(j.jobNumber)}</b> · ${esc(shortDate(j.date))}</p><div class="field"><label>Who called out?</label><select class="select" id="dp065Who">${crew.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}</select></div><div class="field" style="margin-top:12px"><label>Notes (optional)</label><textarea class="textarea" id="dp065Note" placeholder="Callout details, reassignment needed…"></textarea></div>`,
-  `<button class="btn" id="dp065Cancel">Cancel</button><button class="btn primary" id="dp065Save">Flag employee off</button>`);
-  $('#dp065Cancel').onclick=closeModal;$('#dp065Save').onclick=()=>{const name=$('#dp065Who').value,notes=$('#dp065Note').value.trim();j.calloutNames=[...new Set([...(j.calloutNames||[]),name])];
-   if(!(state.callouts||[]).some(x=>x.date===j.date&&normalizeEmployeeName(x.employee)===name&&x.source==='Daily Production'))state.callouts.push({id:uid('co'),employee:name,date:j.date,ptoAvailable:null,source:'Daily Production',attendanceOnly:true,notes:`Job #${j.jobNumber} · ${notes}`});
-   // Keep the original ServiceTitan assignment for audit; mark as called out and unavailable to scheduling.
-   schedulerData().recommendations=(schedulerData().recommendations||[]).map(r=>r.date===j.date&&[r.lead,r.support,...(r.extraCrew||[])].includes(name)?{...r,reviewStatus:'Needs change',reason:[r.reason,`${name} called out — replace employee`].filter(Boolean).join(' • ')}:r);
-   audit('Daily Production callout',name,`${j.date} • #${j.jobNumber}`);closeModal();rebuildCapacityCrewHistory();after();toast(`${name} marked off; scheduler requires reassignment`)};return;
+  openDailyCalloutResolution(id);return;
  }
 }
 
@@ -6549,6 +6709,8 @@ function schedulerCalloutCandidates(row,called,requiredTime){
 }
 function schedulerOpenCalloutReplacement(id,called){
  const data=schedulerData(),r=data.recommendations.find(x=>x.id===id);if(!r)return;
+ const daily=(state.productionJobs||[]).find(j=>j.date===r.date&&String(j.jobNumber)===String(r.jobNumber)&&dp084OnJobNames(j).includes(called));
+ if(daily){openDailyCalloutResolution(daily.id,called);return;}
  const role=schedulerRole(called,r.date),time=r.loadUpTime||schedulerLoadupForDay(called,r.date,r);
  if(role!=='lead'&&role!=='support'){toast('Resolve this employee’s roster role first');return}
  const timeOptions=(val)=>`<option value="">Confirm required load-up</option><option value="06:00" ${val==='06:00'?'selected':''}>6 AM (only 6 AM replacements)</option><option value="07:00" ${val==='07:00'?'selected':''}>7 AM (6 AM or 7 AM replacements)</option>`;
