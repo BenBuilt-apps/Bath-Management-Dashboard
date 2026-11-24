@@ -584,6 +584,95 @@ button{cursor:pointer}
 .dp078-foot{padding:10px 14px;margin:0!important;color:#506f7c;font-size:11px;line-height:1.5;background:#f2f7f9;border-top:1px solid #d9e5e9}
 @media(max-width:760px){.dp078-head h2{font-size:19px}.dp078-table{min-width:940px}.dp078-table td{padding:8px 7px}.dp078-head p{font-size:11px}}
 
+
+/* v0.81 • Compact navigation, report source matrix and expandable operations */
+.ui081-compact .content{padding:14px 17px 28px}
+.ui081-compact .topbar{height:58px;padding:0 18px}
+.ui081-compact .page-head{margin-bottom:12px;gap:8px;align-items:center}
+.ui081-compact .page-head h2{font-size:20px;margin:0 0 2px}
+.ui081-compact .page-head p{font-size:11px;line-height:1.35;max-width:560px}
+.ui081-compact .btn{padding:7px 9px;font-size:11px;border-radius:8px}
+.ui081-compact .btn.small{padding:5px 8px}
+.ui081-compact .card{padding:11px 12px;border-radius:11px;box-shadow:0 3px 13px #1c34400d}
+.ui081-compact .kpi-card{min-height:72px}
+.ui081-compact .kpi-value{font-size:21px;margin:3px 0}
+.ui081-compact .kpi-meta{font-size:10px;line-height:1.25}
+.ui081-compact .section-title{margin:14px 0 7px}
+.ui081-compact .grid{gap:9px}
+.ui081-compact .tabs{margin-bottom:10px}
+.ui081-compact .tab{padding:7px 9px}
+.ui081-compact .table td{padding:6px 8px}
+.ui081-compact .table th{padding:7px 8px}
+.ui081-compact .dropzone{padding:13px 16px;margin-bottom:13px}
+.ui081-compact .dropzone strong{font-size:12px}
+.ui081-compact .dropzone p{margin:3px 0 8px}
+.ui081-compact .report-card{padding:8px}
+.ui081-compact .form-grid{gap:9px}
+.ui081-compact .action-banner{padding:10px 12px;margin:0 0 9px}
+.ui081-compact .alert{padding:8px 10px;margin-bottom:8px}
+.ui081-compact .team-count-card{padding:10px 12px}
+.ui081-compact .team-count-number{font-size:30px;margin:2px 0}
+.ui081-compact .wbr-simple-metric{padding:10px 12px}
+.ui081-compact .wbr-main-panel{padding:13px}
+.ui081-compact .sp-panel{padding:13px}
+.ui081-compact .sch065-top,.ui081-compact .sch065-people{margin:8px 0}
+.ui081-compact .dp078-head{padding:9px 12px}
+.ui081-compact .dp078-head h2{font-size:15px}
+.ui081-compact .dp078-head p{font-size:10px}
+.ui081-compact .dp078-table th{padding:7px 9px}
+.ui081-compact .dp078-table td{padding:6px 9px;line-height:1.3}
+.ui081-compact .dp078-group td{padding:6px 9px}
+.ui081-compact .dp078-foot{display:none}
+.ui081-compact .dp081-totals{grid-template-columns:repeat(4,minmax(0,1fr));margin:4px 0 10px}
+.ui081-compact .dp081-totals .card{padding:9px 11px}
+.ui081-compact .dp081-totals .kpi-value{font-size:21px}
+.ui081-fold{margin:9px 0 0;border:1px solid var(--line);border-radius:11px;background:#fff;overflow:hidden}
+.ui081-fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:11px 13px;font-size:12px;font-weight:850;background:#f7fafb}
+.ui081-fold>summary::-webkit-details-marker{display:none}
+.ui081-fold>summary span{font-weight:600;color:#637981;font-size:10px}
+.ui081-fold[open]>summary{border-bottom:1px solid var(--line)}
+.ui081-fold-body{padding:12px}
+.ui081-fold-body>.card,.ui081-fold-body>.grid,.ui081-fold-body>section{margin-bottom:10px}
+.ui081-inline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:9px;border:1px solid var(--line);border-radius:9px}
+.ui081-inline div{display:flex;flex-direction:column;gap:3px;font-size:11px}.ui081-inline span{color:var(--muted)}
+.imp081-overview{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:12px 0}
+.imp081-title{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px}
+.imp081-title strong{display:block;font-size:14px}.imp081-title small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.imp081-columns{display:grid;grid-template-columns:2.1fr 1.7fr 1.2fr 1.2fr 110px;gap:10px;background:#f2f6f8;color:#72848e;font-size:9px;font-weight:850;padding:8px 14px}
+.imp081-line{border-top:1px solid #edf1f3}
+.imp081-line>summary{list-style:none;display:grid;grid-template-columns:10px minmax(160px,2.1fr) minmax(100px,1.7fr) minmax(105px,1.2fr) minmax(105px,1.2fr) 98px 12px;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;font-size:11px}
+.imp081-line>summary::-webkit-details-marker{display:none}
+.imp081-line>summary:hover{background:#f8fcfc}
+.imp081-dot{display:block;width:8px;height:8px;border-radius:50%;background:#a0aeb5}
+.imp081-dot.good{background:#268763}.imp081-dot.warn{background:#dba02e}.imp081-dot.bad{background:#d24e52}.imp081-dot.info{background:#4484a1}
+.imp081-line b{font-size:11px;min-width:0}.imp081-source,.imp081-stamp,.imp081-range{font-size:10px;color:#607581;min-width:0}
+.imp081-line .status{justify-self:start}.imp081-chevron{font-size:13px;color:#76919d}
+.imp081-line[open] .imp081-chevron{transform:rotate(180deg)}
+.imp081-inner{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 15px;padding:11px 14px 14px 32px;background:#f9fbfc;font-size:10px;color:#596d75;line-height:1.5;border-top:1px solid var(--line)}
+.imp081-failure{color:var(--bad)}
+@media(max-width:1050px){.imp081-columns{display:none}.imp081-line>summary{grid-template-columns:9px minmax(130px,1.3fr) minmax(80px,1fr) 105px 12px}.imp081-line .imp081-stamp,.imp081-line .imp081-range{display:none}.imp081-line .status{grid-column:4}}
+@media(max-width:760px){.ui081-compact .content{padding:10px 10px 22px}.ui081-compact .topbar{height:55px;padding:0 10px}.ui081-compact .page-head{align-items:flex-start}.ui081-compact .page-actions{gap:5px}.ui081-compact .dp081-totals{grid-template-columns:repeat(2,minmax(0,1fr))}.imp081-line>summary{grid-template-columns:9px minmax(100px,1fr) 88px 11px}.imp081-line .imp081-source{display:none}.imp081-line .status{grid-column:3}.imp081-inner{grid-template-columns:1fr;padding:11px}.ui081-fold>summary{padding:10px}}
+@media(max-width:390px){.ui081-compact .topbar h1{font-size:14px}.ui081-compact #ui081Density{font-size:9px;padding:6px}}
+
+
+/* v0.81: collapsed data warnings, visible summary remains accessible everywhere */
+.ui081-confidence{margin:7px 0 10px;border-radius:10px;border:1px solid #e7ce8b;background:#fff9e8;overflow:hidden;color:#795b13}
+.ui081-confidence.bad{border-color:#eec4c6;background:#fff0f0;color:#982d38}
+.ui081-confidence>summary{cursor:pointer;list-style:none;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 12px;font-size:11px}
+.ui081-confidence>summary::-webkit-details-marker{display:none}
+.ui081-confidence>summary span{flex:1;opacity:.82;font-size:10px}
+.ui081-confidence>summary em{font-style:normal;font-weight:750;opacity:.8;white-space:nowrap}
+.ui081-confidence[open]>summary{border-bottom:1px solid #e8dad8}
+.ui081-confidence-inner{padding:9px 12px;font-size:11px;line-height:1.45}
+.ui081-confidence-inner>div{padding:4px 0}
+.ui081-confidence-inner .btn{margin-top:7px}
+@media(max-width:650px){.ui081-confidence>summary{flex-wrap:wrap}.ui081-confidence>summary span{flex-basis:100%;order:2}.ui081-confidence>summary em{margin-left:auto}}
+
+
+.dp081-guard{display:flex;align-items:center;gap:8px;min-height:17px;flex-wrap:wrap;margin:0 0 4px}
+.dp081-guard:empty{display:none}
+.dp081-guard .status{font-size:9px;padding:3px 7px}
+
 </style>
 <style>
 </style>
@@ -725,12 +814,12 @@ button{cursor:pointer}
 <aside class="sidebar" id="sidebar">
 <div class="brand"><small>PJ Fitzpatrick</small><strong>Bath Manager</strong><span>Operating Dashboard</span></div>
 <nav class="nav" id="nav"></nav>
-<div class="sidebar-foot"><b>Local-first build • v0.80 (Exact Status + Done)</b><br/>Data saves in this browser. Use Audit → Backup before moving devices.</div>
+<div class="sidebar-foot"><b>Local-first build • v0.81 (Compact Views)</b><br/>Data saves in this browser. Use Audit → Backup before moving devices.</div>
 </aside>
 <main class="main">
 <header class="topbar">
 <div style="display:flex;align-items:center;gap:10px"><button class="mobile-menu" id="mobileMenu">Menu</button><div><h1 id="topTitle">Home</h1><div class="subtitle" id="topSubtitle">What needs your attention</div></div></div>
-<div class="top-actions"><span class="pill"><span class="dot"></span><span id="saveStateText">Saved locally</span></span><button class="btn small" id="globalBackup">Backup</button></div>
+<div class="top-actions"><button class="btn small" id="ui081Density" type="button" title="Switch between compact and spacious layout">Spacious view</button><span class="pill"><span class="dot"></span><span id="saveStateText">Saved locally</span></span><button class="btn small" id="globalBackup">Backup</button></div>
 </header>
 <div class="content">
 <section class="view active" id="view-home"></section>
@@ -791,7 +880,7 @@ const PRIMARY_NAV=[
  ['capacity','▥','Capacity','Historical performance and forward workload'],
  ['scheduling','↗','Advanced Scheduling','Move-ups, permits, and dead stock'],
  ['wbr','▤','WBR','Weekly business review metrics'],
- ['sales','↔','Sales → Production','Sold-to-install and POSV turnaround'],
+ ['sales','↔','Sales → Production','MTD sold-to-install and POSV turnaround'],
  ['ar','$','Accounts Receivable','Completed unpaid Bath jobs'],
  ['payroll','♙','Employee Manager','Roster, positions, attendance and callouts'],
  ['surveys','✓','Grading Surveys','Weekly Lead accountability'],
@@ -799,13 +888,12 @@ const PRIMARY_NAV=[
  ['audit','◷','Audit','History, backups, and administration']
 ];
 const REPORT_REQUIREMENTS=[
- {id:'mtd-revenue',name:'ServiceTitan MTD Report',feeds:['Daily Production'],match:'Job Number + Completion Date + Job Status + Jobs Total / completed revenue',cadence:'End of day — required before Close Day',endOfDayOnly:true},
+ {id:'mtd-revenue',name:'ServiceTitan MTD Report',feeds:['Daily Production','Sales → Production'],match:'Job Number + Completion Date + Job Status + Jobs Total; Sold On / Sold Date for turnaround calculations',cadence:'End of day — required before Close Day',endOfDayOnly:true},
  {id:'production-workflow',name:'ServiceTitan Production Workflow Report',feeds:['Capacity','Advanced Scheduling','WBR','Daily Production'],match:'Last Appt Date + Job Status + Jobs Total; Assigned Technicians + Tags recommended',cadence:'3 times per day',freshHours:8},
  {id:'tech-timesheet',name:'ServiceTitan Employee Activity / Timesheet',feeds:['Employee Manager','Capacity','Grading Surveys'],match:'Employee name + date + memo + activity / job / business unit (pay fields are not imported)',cadence:'Weekly',freshHours:168},
  {id:'assigned-jobs',name:'ServiceTitan Unscheduled 2 Day Report',feeds:['REQ'],match:'Assigned Technicians + Job Total + assignment/job fields used for REQ credit',cadence:'When determining REQ scores / monthly',freshDays:31},
  {id:'dead-stock',name:'Dead Stock Report',feeds:['Advanced Scheduling'],match:'Dead pans / material SKU + Notes + dimensions',cadence:'Daily',freshHours:24},
  {id:'permit-reference',name:'Permit Quick Reference',feeds:['Advanced Scheduling'],match:'Municipality + permit requirements / notes',cadence:'Monthly',freshDays:31},
- {id:'sold-install-history',name:'Sold-to-Install History (optional)',feeds:['Sales → Production'],match:'Install Job # + Sold On + Completion Date + Job Tags + Business Unit',cadence:'Weekly',asNeeded:true},
  {id:'regional-tracker',name:'Regional Tracker',feeds:['WBR'],match:'Production sheet with Bath Confirmed / Completed',cadence:'Weekly',freshHours:168},
  {id:'grading-surveys',name:'Grading Survey Report',feeds:['Grading Surveys'],match:'Lead Summary + Weekly Tracker or completed survey records with Lead Installer + completion date/time',cadence:'Weekly — preferably Monday or Tuesday',weeklyMondayTuesday:true},
  {id:'accounts-receivable',name:'FIS Paid vs Unpaid Completed Jobs',feeds:['Accounts Receivable'],match:'Job # + Accounting Status + Business Unit + Balance; keep only Complete & Unpaid - Production / Complete & Unpaid - Finance Re-Sign in PHL - Bath Install / PHL - Costco Bath Install',cadence:'Twice weekly',freshHours:96},
@@ -1748,7 +1836,8 @@ function dataConfidenceBanner(issues){
  issues=(issues||[]).filter(Boolean);
  if(!issues.length)return'';
  const blocking=issues.some(x=>x.severity==='bad'),tone=blocking?'bad':'warn';
- return `<div class="alert ${tone}" style="margin-bottom:14px"><b>${blocking?'Data confidence — insufficient information':'Data confidence — warning'}</b><div style="margin-top:7px">${issues.map(x=>`<div style="margin-top:5px"><b>${esc(MODULE_LABELS[x.module]||x.module)}:</b> ${esc(x.title)} — ${esc(x.detail)}</div>`).join('')}</div><button class="btn ${blocking?'danger':''}" style="margin-top:9px" onclick="navigate('imports')">Open Imports</button></div>`;
+ const label=blocking?'Source information needed':'Data freshness reminder';
+ return `<details class="ui081-confidence ${tone}" role="group"><summary><b>${label} · ${issues.length} item${issues.length===1?'':'s'}</b><span>${esc(issues[0].title||'Review report issues')}</span><em>Details ▾</em></summary><div class="ui081-confidence-inner">${issues.map(x=>`<div><b>${esc(MODULE_LABELS[x.module]||x.module)}:</b> ${esc(x.title)} — ${esc(x.detail)}</div>`).join('')}<button class="btn ${blocking?'danger':''} small" onclick="navigate('imports')">Review Imports</button></div></details>`;
 }
 function issueTone(issues,fallback='good'){return(issues||[]).some(x=>x.severity==='bad')?'bad':(issues||[]).length?'warn':fallback}
 function issueSummary(issues,healthy='Supported'){const i=(issues||[])[0];return i?i.title:healthy}
@@ -2348,11 +2437,11 @@ function renderHome(){
   ${attentionCard('Capacity — Next 3 Days',cap3.value,cap3.dates,cap3.tone,'capacity',cap3.footer)}
   ${attentionCard('Accounts Receivable',arI.some(x=>x.severity==='bad')?'Data incomplete':`${ars.total} AR issue${ars.total===1?'':'s'}`,arI.length?arI[0].detail:`${ars.phlBath} PHL Bath • ${ars.costco} Costco${ars.overdue?` • ${ars.overdue} overdue`:ars.dueThisWeek?` • ${ars.dueThisWeek} due this week`:''}`,issueTone(arI,ars.total?'bad':'good'),'ar',arI.length?'Source gap':ars.total?'Completed unpaid jobs':'No active AR issues')}
  </div>
- <div class="alert info" style="margin-top:12px"><b>Future capacity estimates:</b> ${esc(FUTURE_CAPACITY_DISCLAIMER)} Manager-confirmed figures are identified separately.</div>
+ <details class="ui081-fold"><summary>About future capacity estimates <span>Estimates vs manager-confirmed counts ▾</span></summary><div class="ui081-fold-body"><b>Future capacity estimates:</b> ${esc(FUTURE_CAPACITY_DISCLAIMER)} Manager-confirmed figures are identified separately.</div></details>
  <div style="margin-top:16px">${managerActionCenterHtml(actions)}</div>
  <div class="grid two" style="margin-top:16px">
   <div class="card"><div class="card-head"><div><div class="card-title">Today / Latest Production</div><div class="card-sub">${fmtDate(pdate)}</div></div><button class="btn small" data-go="daily">Open closeout</button></div>${productionMini(ps)}</div>
-  ${systemHealthHtml()}
+  <details class="ui081-fold"><summary>Module health & source details <span>Expand ▾</span></summary><div class="ui081-fold-body">${systemHealthHtml()}</div></details>
  </div>`;
  $('#homeAsOf').onchange=e=>setAsOf(e.target.value);
  el.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>navigate(b.dataset.go));
@@ -2468,19 +2557,33 @@ function reportUploadFresh(r){
  if(ageDays<=limitDays)return['ok','Upload cadence is current'];
  return['stale',`Upload is ${Math.floor(ageDays)} days old`];
 }
+
+// v0.81: one compact source matrix replaces duplicate coverage timeline + report cards.
+function report081UnifiedOverview(){
+ const rows=REPORT_REQUIREMENTS.map(r=>{
+  const c=reportCoverageInfo(r.id),last=c.last,attempt=latestImportAttempt(r.id),failed=attempt?.status==='Error'&&(!last||attempt.importedAt>last.importedAt);
+  const tone=c.tone==='ok'?'good':c.tone==='stale'?'warn':c.tone==='info'?'info':'bad';
+  const coverage=c.start&&c.end?(c.start===c.end?fmtDate(c.end):`${fmtDate(c.start)} – ${fmtDate(c.end)}`):c.end?fmtDate(c.end):'Not available';
+  const recency=last?formatImportDateTime(last.importedAt):'Not uploaded';
+  const label=c.tone==='ok'?'Current':c.tone==='stale'?'Refresh due':c.tone==='info'?'As needed':'Missing';
+  return `<details class="imp081-line"><summary><span class="imp081-dot ${tone}" aria-hidden="true"></span><b>${esc(r.name)}</b><span class="imp081-source">${esc(r.feeds.join(' · '))}</span><span class="imp081-stamp">${esc(recency)}</span><span class="imp081-range">${esc(coverage)}</span>${statusChip(label,tone)}<span class="imp081-chevron">▾</span></summary>
+   <div class="imp081-inner"><span><b>Recommended:</b> ${esc(r.cadence)}</span><span><b>Recognized by:</b> ${esc(r.match)}</span><span><b>Last file:</b> ${esc(last?.fileName||'None')}</span><span><b>Coverage:</b> ${esc(coverage)}</span><span><b>Freshness:</b> ${esc(c.freshMessage)}</span>${failed?`<span class="imp081-failure">Most recent attempt failed: ${esc(formatImportDateTime(attempt.importedAt))}</span>`:''}</div></details>`;
+ }).join('');
+ const missing=REPORT_REQUIREMENTS.filter(r=>!r.asNeeded&&!r.endOfDayOnly&&reportUploadFresh(r)[0]!=='ok');
+ return `<section class="imp081-overview"><div class="imp081-title"><div><strong>Reports & Coverage</strong><small>Single source list · expand a row for cadence, coverage and file details</small></div><span class="status ${missing.length?'warn':'good'}">${missing.length} due / missing</span></div><div class="imp081-columns"><span>REPORT</span><span>FEEDS</span><span>LAST UPLOAD</span><span>DATE COVERAGE</span><span>STATUS</span></div>${rows}</section>`;
+}
 function renderImports(){
  if(removeResolvedEmployeeReviewItems())saveSoon();
  const el=$('#view-imports'),pending=state.reviewQueue.filter(x=>x.status==='pending'),errors=(state.importErrors||[]).slice().sort((a,b)=>(b.ts||'').localeCompare(a.ts||'')),issues=moduleDataIssues('imports');
  const employeePending=pending.filter(x=>['Employee Not In Employee Manager','Payroll Employee Not On Roster'].includes(x.type));
  const otherPending=pending.filter(x=>!['Employee Not In Employee Manager','Payroll Employee Not On Roster'].includes(x.type));
- el.innerHTML=pageHead('Imports','Upload recurring operating reports once. Report Coverage shows what dates each source actually supports, while freshness shows whether its recommended refresh cadence is current.',`<button class="btn" onclick="exportSection('imports')">Export Excel</button><button class="btn" id="importBackup">Import backup</button>`)+dataConfidenceBanner(issues)+`
- <div class="dropzone" id="dropzone"><strong>Drop Excel reports here</strong><p>Multiple .xlsx files are supported. Imports are transactional: a failed report is rolled back instead of leaving partial data.</p><button class="btn primary" id="chooseFiles">Choose reports</button><input id="filePicker" class="hidden-input" type="file" accept=".xlsx,.xlsm,.xls" multiple></div>
+ el.innerHTML=pageHead('Imports','Upload reports once. Review freshness and date coverage together in one compact list; expand only what you need.',`<button class="btn" onclick="exportSection('imports')">Export Excel</button><button class="btn" id="importBackup">Import backup</button>`)+dataConfidenceBanner(issues)+`
+ <div class="dropzone" id="dropzone"><strong>Upload operating reports</strong><p>Drop .xlsx reports or choose files · Invalid imports roll back automatically.</p><button class="btn primary" id="chooseFiles">Choose reports</button><input id="filePicker" class="hidden-input" type="file" accept=".xlsx,.xlsm,.xls" multiple></div>
  ${errors.length?`<div class="section-title">Technical Import Errors (${errors.length})</div><div class="card">${errors.slice(0,12).map(importErrorRow).join('')}</div>`:''}
  ${employeePending.length?`<div class="unknown-employee-notice" role="status"><b>⚠ ${employeePending.length} unidentified employee name${employeePending.length===1?'':'s'} found in reporting</b><p>Make sure your Employee Manager roster is up to date. These names may be new hires, alternate spellings, former employees, or out-of-scope people. No one has been excluded automatically.</p></div><details class="unknown-employee-panel" id="unknownEmployeePanel"><summary><span>Review unidentified employees (${employeePending.length})</span><span>Show / hide names ▾</span></summary><div style="padding:12px 14px"><div class="unknown-employee-actions"><label for="employeeSelectAll"><input type="checkbox" id="employeeSelectAll"/> All (${employeePending.length})</label><button type="button" class="btn small danger" id="bulkExcludeEmployees" disabled>Exclude selected (<span id="bulkEmployeeSelectedCount">0</span>)</button><span class="muted" style="font-size:10px">Select all or individual names. Confirmation required; no roster records are deleted.</span></div>${employeePending.map(x=>`<div class="unknown-employee-entry"><label class="unknown-select-label"><input type="checkbox" class="employee-unknown-checkbox" data-employee-id="${esc(x.id)}" data-employee-source="${esc(x.sourceName||x.employee)}"/> Select</label>${reviewQueueRow(x)}</div>`).join('')}</div></details>`:''}
  ${otherPending.length?`<div class="section-title">Other Manager Reporting Decisions (${otherPending.length})</div><div class="card">${otherPending.map(reviewQueueRow).join('')}</div>`:''}
- ${reportCoverageHtml()}
- <div class="section-title">Main Reports</div><div class="section-note" style="margin-bottom:10px">Recommended cadence is shown on each card. MTD is an end-of-day confirmation source and is not late during the workday; it is required when you select Close Day. Date/time reflects the last successful upload. Grading Surveys reset each Monday, with Monday or Tuesday preferred.</div><div class="report-grid">${REPORT_REQUIREMENTS.map(reportRequirementCard).join('')}</div>
- <div class="section-title">Import History</div>${importHistory()}`;
+ ${report081UnifiedOverview()}
+ <details class="ui081-fold"><summary>Import history <span>${state.imports.length} files · Show details</span></summary><div class="ui081-fold-body">${importHistory()}</div></details>`;
  const dz=$('#dropzone'),fp=$('#filePicker');$('#chooseFiles').onclick=()=>fp.click();fp.onchange=e=>processFiles([...e.target.files]);dz.ondragover=e=>{e.preventDefault();dz.classList.add('drag')};dz.ondragleave=()=>dz.classList.remove('drag');dz.ondrop=e=>{e.preventDefault();dz.classList.remove('drag');processFiles([...e.dataTransfer.files])};$('#importBackup').onclick=()=>$('#restoreInput').click();el.querySelectorAll('[data-review]').forEach(b=>b.onclick=()=>reviewAction(b.dataset.review,b.dataset.id));
  const allBox=$('#employeeSelectAll'),selectBoxes=[...el.querySelectorAll('.employee-unknown-checkbox')],bulkButton=$('#bulkExcludeEmployees'),selectionCount=$('#bulkEmployeeSelectedCount');
  if(allBox&&bulkButton){
@@ -2654,10 +2757,9 @@ async function parseXlsx(file){const files=await unzipXlsx(await file.arrayBuffe
 function rowText(r){return r.map(x=>String(x??'')).join(' | ').toLowerCase()}
 function filenameReportHint(fileName=''){
  const n=String(fileName||'').toLowerCase();
- if(/sold.to.install|sales.to.production|install.history/i.test(n))return'sold-install-history';
  if(/production workflow/.test(n))return'production-workflow';
  if(/fis.*paid.*unpaid.*completed|paid vs unpaid completed/.test(n))return'accounts-receivable';
- if(/production revenue mtd|mtd.*dashboard|mtd.*revenue/.test(n))return'mtd-revenue';
+ if(/production revenue mtd|mtd.*dashboard|mtd.*revenue|month.to.date|mtd report/i.test(n))return'mtd-revenue';
  if(/bath payroll.*details|payroll w_? details|tech timesheet.*time details/.test(n))return'tech-timesheet';
  if(/employee.*roster|roster.*employee|rate roster/.test(n))return'payroll-roster';
  if(/grading.*survey/.test(n))return'grading-surveys';
@@ -2669,10 +2771,9 @@ function filenameReportHint(fileName=''){
 }
 function reportDefinition(id){
  const defs={
-  'sold-install-history':{id,label:'Sold-to-Install History',feeds:['Sales → Production'],confidence:'High'},
   'production-workflow':{id,label:'ServiceTitan Production Workflow Report',feeds:['Capacity','Advanced Scheduling','WBR','Daily Production'],confidence:'High'},
   'accounts-receivable':{id,label:'FIS Paid vs Unpaid Completed Jobs',feeds:['Accounts Receivable'],confidence:'High'},
-  'mtd-revenue':{id,label:'ServiceTitan MTD Report',feeds:['Daily Production'],confidence:'High'},
+  'mtd-revenue':{id,label:'ServiceTitan MTD Report',feeds:['Daily Production','Sales → Production'],confidence:'High'},
   'tech-timesheet':{id,label:'ServiceTitan Employee Activity / Timesheet',feeds:['Employee Manager','Capacity','Grading Surveys'],confidence:'High'},
   'payroll-roster':{id,label:'Employee Roster',feeds:['Employee Manager'],confidence:'High'},
   'grading-surveys':{id,label:'Grading Survey Report',feeds:['Grading Surveys'],confidence:'High'},
@@ -2694,7 +2795,6 @@ function detectReport(book,fileName=''){
 
  if(sheetNames.includes('lead summary')&&sheetNames.includes('weekly tracker'))return reportDefinition('grading-surveys');
 
- if((has('sold on','completion date')||has('sold date','completion date'))&&(sample.includes('job #')||sample.includes('job number')))return reportDefinition('sold-install-history');
  // Workflow before AR: Workflow exports may include Accounting Status and Balance.
  if(has('last appt date','job status')&&(sample.includes('jobs total')||sample.includes('job total')))return reportDefinition('production-workflow');
 
@@ -2729,8 +2829,7 @@ async function processFiles(files){
    toast(`Reading ${f.name}…`);
    const book=await parseXlsx(f);det=detectReport(book,f.name);
    let through='';
-   if(det.id==='sold-install-history')through=importSoldInstallHistory(book,id,f.name);
-   else if(det.id==='daily-production')through=importDaily(book,id);
+   if(det.id==='daily-production')through=importDaily(book,id);
    else if(det.id==='mtd-revenue')through=importMtdRevenue(book,id,f.name);
    else if(det.id==='grading-surveys')through=importSurveys(book,id);
    else if(det.id==='tech-timesheet')through=importTechTimesheet(book,id,f.name);
@@ -2741,14 +2840,14 @@ async function processFiles(files){
    else if(det.id==='dead-stock')through=importDeadStock(book,id,f.name);
    else if(det.id==='permit-reference')through=importPermitReference(book,id,f.name);
    else if(det.id==='assigned-jobs')through=importAssignedJobs(book,id,f.name);
-   else throw Error('This Excel file is not recognized as one of the configured dashboard reports.');
+   else throw Error('This report is not part of the current import list. Sold-to-Install now comes from the MTD report (Sold On + Completion Date); no separate history upload is needed.');
 
    // Importers must actually populate their destination; otherwise do not mark the file current.
    validateImportedModule(det.id,id);
    state.importErrors=(state.importErrors||[]).filter(e=>e.fileName!==f.name);
    state.imports.push({id,fileName:f.name,reportType:det.id,label:det.label,feeds:det.feeds,confidence:det.confidence,importedAt:new Date().toISOString(),dateThrough:through,status:'Imported'});
    if(['tech-timesheet','production-workflow','grading-surveys','assigned-jobs','payroll-roster'].includes(det.id))refreshPayrollRosterReview();
-   if(['daily-production','mtd-revenue','production-workflow','sold-install-history'].includes(det.id))salesHistoryFromDaily();
+   if(['daily-production','mtd-revenue','production-workflow'].includes(det.id))salesHistoryFromDaily();
    audit('Report imported',f.name,`${det.label} → ${det.feeds.join(', ')||'dashboard'}`);
    saveSoon();toast(`${f.name}: imported`);
   }catch(err){
@@ -2763,7 +2862,6 @@ async function processFiles(files){
  renderImports();if(currentView!=='imports')renderView(currentView);
 }
 function validateImportedModule(type,importId){
- if(type==='sold-install-history'&&!(state.salesInstallHistory||[]).length)throw Error('No Bath sold-to-install history rows were imported.');
  if(type==='production-workflow'&&!(state.workflowRows||[]).length)throw Error('Production Workflow parsed zero usable rows.');
  if(type==='tech-timesheet'&&(!(state.capacityTimesheetRows||[]).length||state.capacityPayrollCoverage?.importId!==importId))throw Error('Employee Activity/Timesheet parsed zero usable employee/date rows.');
  if(type==='payroll-roster'&&!state.rosterSourceNames?.length)throw Error('Employee Roster did not populate employee names.');
@@ -2976,6 +3074,7 @@ function importMtdRevenue(book,importId,fileName='MTD Revenue'){
  if(!h)throw Error('Could not map Job Number, Completion Date, and completed revenue / Jobs Total in the MTD report.');
  const H=h.headers,jobI=findHeaderIndex(H,[/^job\s*#$/,/^job number$/,/job.*number/]),totalI=findHeaderIndex(H,[/^jobs total revenue$/,/^jobs total$/,/completed.*revenue/,/^job total$/,/job.*total/,/^revenue$/]),dateI=findHeaderIndex(H,[/^completion date$/,/completed.*date/,/date completed/]),statusI=findHeaderIndex(H,[/^job status$/,/job.*status/,/^status$/]),buI=findHeaderIndex(H,[/^business unit$/,/business unit/]),customerI=findHeaderIndex(H,[/^customer name$/,/customer/]),tagsI=findHeaderIndex(H,[/^tags?$/,/workflow flags/,/current tags/,/job tags/]),crewI=findHeaderIndex(H,[/^assigned technicians$/,/assigned tech/,/installer/]),counterI=findHeaderIndex(H,[/appointment.*counter/,/appt.*counter/,/appointment count/]);
  const filterRange=parseDateRangeText(workbookFilterValue(book,/^Date Range$/i));
+ const soldDateI=findHeaderIndex(H,[/^sold on$/i,/^sold date$/i,/^date sold$/i]);
  let through='',matched=0,created=0,netCO=0,confirmed=0,readRows=0;const updates=[],daily=new Map();
  for(const r of h.s.rows.slice(h.row+1)){
   const jobNo=String(r[jobI]??'').trim();if(!jobNo||!/\d/.test(jobNo))continue;const doneDate=parseDateCell(r[dateI]);if(!doneDate)continue;
@@ -2996,7 +3095,7 @@ function importMtdRevenue(book,importId,fileName='MTD Revenue'){
  }
  if(!readRows)throw Error('MTD headers were found, but no completion-date revenue rows could be read.');
  state.mtdDailyTotals=[...daily.values()].map(x=>({...x,sourceImportId:importId,fileName,importedAt:new Date().toISOString()})).sort((a,b)=>a.date.localeCompare(b.date));
- state.mtdCoverage={importId,fileName,rangeStart:filterRange.start||'',rangeEnd:filterRange.end||through||'',rowLatestDate:through||'',hasJobStatus:statusI>=0,importedAt:new Date().toISOString()};
+ state.mtdCoverage={importId,fileName,rangeStart:filterRange.start||'',rangeEnd:filterRange.end||through||'',rowLatestDate:through||'',hasJobStatus:statusI>=0,hasSoldDate:soldDateI>=0,importedAt:new Date().toISOString()};
  state.mtdReconciliations.unshift({id:uid('mtd'),importId,fileName,importedAt:new Date().toISOString(),matched,created,confirmed,netChangeOrder:netCO,updates});
  for(const d of Object.keys(state.closeDayValidation||{})){if(mtdCloseDayCheck(d).ok)delete state.closeDayValidation[d]}
  rebuildCapacityCrewHistory();
@@ -3458,7 +3557,7 @@ function productionIssueTableHtml(){
 function initProductionIssueTracker(){
  const el=$('#view-daily'),details=$('#dpIssueTracker');if(!details)return;
  details.addEventListener('toggle',()=>{productionIssueTrackerOpen=details.open});
- el.querySelector('#dpViewIssueTracker')?.addEventListener('click',()=>{details.open=true;details.scrollIntoView({behavior:'smooth',block:'start'})});
+ el.querySelector('#dpViewIssueTracker')?.addEventListener('click',()=>{const container=el.querySelector('#dp081Issues');if(container)container.open=true;details.open=true;details.scrollIntoView({behavior:'smooth',block:'start'})});
  function refresh(){const target=el.querySelector('#dpIssueContents');if(target)target.innerHTML=productionIssueTableHtml();bindEdits()}
  function bindEdits(){el.querySelectorAll('[data-issue-edit]').forEach(b=>b.onclick=()=>openJobModal(b.dataset.issueEdit))}
  el.querySelector('#dpIssuePeriod')?.addEventListener('change',e=>{productionIssueRange=e.target.value;refresh()});
@@ -3725,30 +3824,30 @@ function dp078Table(jobs){
 function renderDaily(){
  const el=$('#view-daily');if(!dailyDate)dailyDate=latestProdDate()||asOf();
  const stats=prodStats(dailyDate),jobs=state.productionJobs.filter(j=>j.date===dailyDate),issues=moduleDataIssues('daily',{date:dailyDate}),mtdSupported=mtdReportSupportsDate(dailyDate),closeBlocked=!!state.closeDayValidation?.[dailyDate],qf=workflowQuickFillStats();
- el.innerHTML=pageHead('Daily Production','Morning confirmed jobs and crew → end-of-day closeout. Today and past days are preserved on Workflow refresh; future days remain flexible. MTD is required only when you select Close Day.',`<button class="btn" onclick="exportSection('daily')">Export Excel</button>${dateNav('prodDate',dailyDate)}<button class="btn" id="uploadMtd">Upload MTD Revenue</button><input id="dailyMtdPicker" class="hidden-input" type="file" accept=".xlsx,.xlsm"><button class="btn" id="addWarranty">+ Add job</button><button class="btn primary" id="addProdJob">+ Production job</button><button class="btn dark" id="closeDay">Close day</button>`)+dataConfidenceBanner(issues)+`
- ${dailyCapacityCard()}
- ${daily073EmployeeCoverageHtml(dailyDate)}
- ${memoCapacityReviewHtml(dailyDate)}
- <div class="grid kpi">
-  ${kpi('Original Confirmed',jobs.length?money(stats.confirmed):'—',`${stats.expectedJobs} scheduled installations · unchanged by status`)}
-  ${kpi('Completed · MTD Actual',mtdSupported?money(stats.actual):'—',mtdSupported?`${stats.completed} marked complete • ${stats.reconciled} matched to MTD`:'Awaiting end-of-day MTD report')}
-  ${kpi('Closeout Checklist',`${stats.internalCloseoutComplete}/${stats.internalCloseoutNeeded}`,stats.internalCloseoutNeeded===0?'No jobs ready for closeout':stats.internalCloseoutComplete===stats.internalCloseoutNeeded?'All job checklists complete':`${stats.internalCloseoutNeeded-stats.internalCloseoutComplete} job${stats.internalCloseoutNeeded-stats.internalCloseoutComplete===1?'':'s'} still need closeout`)}
-  ${kpi('Breakage · Not Completed',money(stats.breakage),`${stats.breakageJobs} unsuccessful job${stats.breakageJobs===1?'':'s'} · excluded from Completed`)}
+ el.innerHTML=pageHead('Daily Production','Open jobs first · finished jobs last · protected once the workday begins.',`<button class="btn" onclick="exportSection('daily')">Export Excel</button>${dateNav('prodDate',dailyDate)}<button class="btn" id="uploadMtd">Upload MTD</button><input id="dailyMtdPicker" class="hidden-input" type="file" accept=".xlsx,.xlsm"><button class="btn" id="addWarranty">+ Warranty / OOM</button><button class="btn primary" id="addProdJob">+ Install</button><button class="btn dark" id="closeDay">Close Day</button>`)+dataConfidenceBanner(issues)+`
+ <div class="grid kpi dp081-totals">
+  ${kpi('Original Confirmed',jobs.length?money(stats.confirmed):'—',`${stats.expectedJobs} scheduled · never replaced by MTD`)}
+  ${kpi('Completed · MTD',mtdSupported?money(stats.actual):'—',mtdSupported?`${stats.completed} completed · ${stats.reconciled} reconciled`:'MTD required for actuals')}
+  ${kpi('Breakage',money(stats.breakage),`${stats.breakageJobs} unsuccessful · not completed`)}
+  ${kpi('Closeout',`${stats.internalCloseoutComplete}/${stats.internalCloseoutNeeded}`,`${Math.max(0,stats.internalCloseoutNeeded-stats.internalCloseoutComplete)} checklists outstanding`)}
  </div>
- ${productionCloseoutProgress(jobs)}
- <div class="section-title">Quick Fill Jobs from Latest Workflow</div><div class="grid kpi" style="margin-bottom:14px">
-  ${kpi('Bath Stock Check',qf.supported?qf.stock:'—',qf.supported?'Jobs that may be quickly scheduled':'Current Workflow required')}
-  ${kpi('Materials Received Ready',qf.supported?qf.materials:'—',qf.supported?'Jobs that may be quickly scheduled':'Current Workflow required')}
- </div>
- ${mtdSupported&&stats.needsConfirmation?`<div class="alert bad" style="margin-top:14px"><b>${stats.needsConfirmation} completed job${stats.needsConfirmation===1?'':'s'} not confirmed by the MTD report.</b> Look for the <b>Needs confirmation</b> label below. A job is confirmed only when the MTD report has a Completion Date and Job Status of Invoiced or Complete Ready to Invoice.</div>`:''}
- ${!mtdSupported&&!closeBlocked?`<div class="alert info" style="margin-top:14px"><b>MTD is not due yet.</b> Upload the MTD report at the end of the day, then select <b>Close Day</b>. The dashboard will only block closure if today's MTD confirmation is missing or does not cover this production date.</div>`:''}
+ <div class="dp081-guard">${productionDayStarted(dailyDate)?`<span class="status info" title="Workday job list is protected from automatic removal; updates depend on the date.">✓ Workday protected</span>`:''}${jobs.filter(j=>j.workflowRetainedFromEarlierImport).length?`<span class="status warn">${jobs.filter(j=>j.workflowRetainedFromEarlierImport).length} retained from earlier Workflow — closeout review</span>`:''}</div>
+ ${jobs.some(j=>productionHasTrackedIssue(j)||productionHasBreakage(j))?productionIssueStrip(jobs):''}
+ ${mtdSupported&&stats.needsConfirmation?`<div class="alert bad"><b>${stats.needsConfirmation} completed job(s) need MTD confirmation.</b> Check the job status and uploaded report.</div>`:''}
+ ${dp078Table(jobs)}
+ <details class="ui081-fold dp081-secondary" id="dp081Operations"><summary>Operational visits · staffing · capacity <span>${(state.warrantyVisits||[]).filter(v=>v.date===dailyDate).length} operational visits · staffing, memo holds & protection ▾</span></summary><div class="ui081-fold-body">
  ${warrantyDayHtml(dailyDate)}
- <div class="section-title">Daily Job Board</div><div class="dp-job-legend"><span class="blue">Blue · 2-day (even if old BRKG tag)</span><span class="orange">Orange · Cali</span><span class="yellow">Yellow · Breakage</span><span style="color:#bc2434">Red installer name · Missing from Employee Manager</span></div><div class="section-note">Assigned crew is shown for each job. Two-day detection includes current Workflow tags; historical BRKG tags stay visible without overriding blue. Only these operational tags are displayed: 2 Day, Premium, Tier 1, Tier 2, Tier 3, Cali Door, BRKG, and appointment counter 1–4. The morning confirmed amount is preserved; MTD supplies authoritative completed revenue by Completion Date at end of day.</div>
  ${productionProtectedDayHtml(dailyDate,jobs)}
- ${productionIssueStrip(jobs)}
- ${jobs.length?dp078Table(jobs):empty('No jobs for this date','Add a job manually or upload Production Workflow; Start/Scheduled jobs are synced automatically.',`<button class="btn primary" id="emptyAddProd">Add job</button>`)}
- <div class="grid two" style="margin-top:16px"><div class="card"><div class="card-title">Exceptions</div><div style="margin-top:10px">${exceptionRows(jobs)}</div></div><div class="card"><div class="card-title">Daily Totals</div><div style="margin-top:10px">${summaryRows({...stats,_mtdUnsupported:!mtdSupported})}</div></div></div>
- ${productionIssueTrackerHtml()}`;
+ ${daily073EmployeeCoverageHtml(dailyDate)}
+ ${dailyCapacityCard()}
+ ${memoCapacityReviewHtml(dailyDate)}
+ ${productionCloseoutProgress(jobs)}
+ <div class="ui081-inline"><div><b>Quick-fill opportunities</b><span>Stock Check: ${qf.supported?qf.stock:'—'} · Materials Ready: ${qf.supported?qf.materials:'—'}</span></div><button class="btn small" data-go="scheduling">Advanced Scheduling</button></div>
+ </div></details>
+ <details class="ui081-fold dp081-secondary" id="dp081Issues"><summary>Exceptions & daily totals <span>${jobs.filter(j=>productionIsBreakage(j.status)||productionHasIssue(j)).length} flagged · Full financial breakdown ▾</span></summary><div class="ui081-fold-body"><div class="grid two"><div class="card"><div class="card-title">Exceptions</div><div style="margin-top:10px">${exceptionRows(jobs)}</div></div><div class="card"><div class="card-title">Daily Totals</div><div style="margin-top:10px">${summaryRows({...stats,_mtdUnsupported:!mtdSupported})}</div></div></div>
+ ${productionIssueTrackerHtml()}
+ ${!mtdSupported&&!closeBlocked?`<div class="alert info" style="margin-top:12px"><b>MTD is due at Close Day.</b> Upload the report with Completion Date / Job Status before final closeout.</div>`:''}
+ </div></details>`;
  el.querySelectorAll('[data-dp077-update]').forEach(x=>x.onclick=()=>dp077OpenUpdate(x.dataset.dp077Update));$('#prodDate').onchange=e=>{dailyDate=e.target.value;renderDaily()};$('#dailyOpenCapacity').onclick=()=>navigate('capacity');$('#addProdJob').onclick=()=>openJobModal();$('#addWarranty').onclick=()=>openWarrantyModal();$('#wtAddInSection').onclick=()=>openWarrantyModal();el.querySelectorAll('[data-wty-edit]').forEach(b=>b.onclick=()=>openWarrantyModal(b.dataset.wtyEdit));$('#emptyAddProd')&&($('#emptyAddProd').onclick=()=>openJobModal());$('#closeDay').onclick=()=>closeProductionDay(dailyDate);$('#uploadMtd').onclick=()=>$('#dailyMtdPicker').click();$('#dailyMtdPicker').onchange=e=>{if(e.target.files?.length)processFiles([...e.target.files])};el.querySelectorAll('[data-job-edit]').forEach(b=>b.onclick=()=>openJobModal(b.dataset.jobEdit));el.querySelectorAll('[data-job-closeout]').forEach(b=>b.onclick=()=>openCloseoutModal(b.dataset.jobCloseout));initProductionIssueTracker();
  el.querySelectorAll('[data-daily073-add]').forEach(b=>b.onclick=()=>openWarrantyModal('',dailyDate,b.dataset.daily073Add));
 }
@@ -5363,7 +5462,8 @@ function salesMerge(record){
  let prior=state.salesInstallHistory.find(x=>String(x.jobNumber)===job);
  if(!prior){prior={jobNumber:job,customer:'',soldDate:'',soldAt:'',completedDate:'',completedAt:'',tags:'',businessUnit:'',jobStatus:'',source:'',lastSeen:''};state.salesInstallHistory.push(prior)}
  const d=salesIso(record.soldDate),done=salesIso(record.completedDate);
- if(d&&(!prior.soldDate||d<prior.soldDate))prior.soldDate=d;
+ if(record.soldSource==='MTD'&&d){prior.soldDate=d;prior.soldSource='MTD'}
+ else if(d&&!prior.soldDate&&record.soldSource==='MTD'){prior.soldDate=d;prior.soldSource='MTD'}
  if(done&&(!prior.completedDate||done>prior.completedDate))prior.completedDate=done;
  if(record.soldAt&&(!prior.soldAt||record.soldAt<prior.soldAt))prior.soldAt=record.soldAt;
  if(record.completedAt&&(!prior.completedAt||record.completedAt>prior.completedAt))prior.completedAt=record.completedAt;
@@ -5375,17 +5475,16 @@ function salesMerge(record){
 function salesHistoryFromWorkflow(o,source){
  const bu=String(workflowValue(o,[/^business unit$/i])||'');if(!isPHLBathBusinessUnit(bu))return;
  const job=String(workflowValue(o,[/^job\s*#$/i,/^job number$/i])||'').trim(),st=String(workflowValue(o,[/^job status$/i])||'');
- const sold=workflowValue(o,[/^sold on$/i,/^sold date$/i,/^sold at$/i]);
  const finish=workflowValue(o,[/^completion date$/i,/^completed date$/i]);
  const next=workflowValue(o,[/^next appt start date$/i]);
  const completed=/^complete(?:d)?$/i.test(st)&&!next;
- salesMerge({jobNumber:job,customer:String(workflowValue(o,[/^customer name$/i])||''),soldDate:salesIso(sold),soldAt:salesTimestamp(sold),completedDate:completed?salesIso(finish):'',completedAt:completed?salesTimestamp(finish):'',tags:[workflowValue(o,[/^job tags$/i]),workflowValue(o,[/^tags$/i])].filter(Boolean).join(','),jobStatus:st,businessUnit:bu,source:'Production Workflow',lastSeen:todayISO()});
+ salesMerge({jobNumber:job,customer:String(workflowValue(o,[/^customer name$/i])||''),completedDate:completed?salesIso(finish):'',completedAt:completed?salesTimestamp(finish):'',tags:[workflowValue(o,[/^job tags$/i]),workflowValue(o,[/^tags$/i])].filter(Boolean).join(','),jobStatus:st,businessUnit:bu,source:'Production Workflow',lastSeen:todayISO()});
 }
 function salesHistoryFromMtdRow(headers,row,jobNo,finish,job,source){
  const get=(patterns)=>{const i=findHeaderIndex(headers,patterns);return i>=0?row[i]:''};
  const bu=get([/^business unit$/i,/business unit/i]);if(bu&&!isPHLBathBusinessUnit(bu))return;
  const sold=get([/^sold on$/i,/^sold date$/i,/^date sold$/i]);const completeValue=get([/^completion date$/i,/^completed date$/i]);
- salesMerge({jobNumber:jobNo,customer:job?.customer||'',soldDate:salesIso(sold),soldAt:salesTimestamp(sold),completedDate:finish,completedAt:salesTimestamp(completeValue),tags:[job?.tagsRaw||'',get([/^job tags$/i,/^tags$/i])].filter(Boolean).join(','),businessUnit:String(bu||''),jobStatus:'Complete',source:'MTD completion report',lastSeen:todayISO()});
+ salesMerge({jobNumber:jobNo,customer:job?.customer||'',soldDate:salesIso(sold),soldAt:salesTimestamp(sold),soldSource:'MTD',completedDate:finish,completedAt:salesTimestamp(completeValue),tags:[job?.tagsRaw||'',get([/^job tags$/i,/^tags$/i])].filter(Boolean).join(','),businessUnit:String(bu||''),jobStatus:'Complete',source:'MTD completion report',lastSeen:todayISO()});
 }
 function salesHistoryFromDaily(){
  for(const j of state.productionJobs||[]){
@@ -5394,24 +5493,8 @@ function salesHistoryFromDaily(){
    const isComplete=COMPLETED_STATUSES.has(String(j.status||''));
    if(!isComplete&&!existing)continue;
    const finish=isComplete?(salesIso(j.completionDate)||salesIso(j.date)):'';
-   salesMerge({jobNumber:no,customer:j.customer||'',soldDate:salesIso(j.soldOn||j.soldDate),completedDate:finish,tags:j.tagsRaw||'',jobStatus:isComplete?'Complete':j.status,source:isComplete?'Daily Production / Complete-Confirmed':'Production metadata',lastSeen:todayISO()});
+   salesMerge({jobNumber:no,customer:j.customer||'',completedDate:finish,tags:j.tagsRaw||'',jobStatus:isComplete?'Complete':j.status,source:isComplete?'Daily Production / Complete-Confirmed':'Production metadata',lastSeen:todayISO()});
  }
-}
-function importSoldInstallHistory(book,sourceId,fileName){
- const h=findBestHeaderRow(book,[[/^job\s*#$/i,/job number/i],[/^sold on$/i,/sold date/i,/date sold/i],[/^completion date$/i,/date completed/i]]);
- if(!h)throw Error('Sold-to-Install history must contain Job Number, Sold On (or Sold Date), and Completion Date columns.');
- let count=0,latest='';const H=h.headers;
- for(const row of h.s.rows.slice(h.row+1)){
-  const pick=p=>{const i=findHeaderIndex(H,p);return i<0?'':row[i]};
-  const job=String(pick([/^job\s*#$/i,/^job number$/i])||'').trim();if(!/^\d+$/.test(job))continue;
-  const bu=String(pick([/^business unit$/i])||'');if(bu&&!isPHLBathBusinessUnit(bu))continue;
-  const sold=pick([/^sold on$/i,/^sold date$/i,/date sold/i]),done=pick([/^completion date$/i,/date completed/i]);
-  if(!salesIso(sold)&&!salesIso(done))continue;
-  salesMerge({jobNumber:job,customer:String(pick([/^customer name$/i])||''),soldDate:salesIso(sold),soldAt:salesTimestamp(sold),completedDate:salesIso(done),completedAt:salesTimestamp(done),tags:String(pick([/^job tags$/i,/^tags$/i])||''),businessUnit:bu,jobStatus:done?'Complete':'',source:fileName,lastSeen:todayISO()});
-  const d=salesIso(done)||salesIso(sold);if(d>latest)latest=d;count++;
- }
- if(!count)throw Error('Sold-to-Install history had no usable PHL Bath rows.');
- audit('Sold-to-install history imported','Sales to Production',`${count} rows from ${fileName}`);return latest;
 }
 function salesBucketRange(type,ref){
  const d=salesIso(ref)||asOf(),year=+d.slice(0,4),month=+d.slice(5,7),dt=new Date(d+'T12:00:00Z');let start='',end='';
@@ -5423,14 +5506,13 @@ function salesBucketRange(type,ref){
 }
 function previousSalesRef(type,start){if(type==='week')return addDaysISO(start,-7);if(type==='year')return `${Number(start.slice(0,4))-1}-12-31`;if(type==='quarter')return addDaysISO(start,-1);return addDaysISO(start,-1)}
 function salesAllRecords(){
- const m=new Map();for(const x of state.salesInstallHistory||[]){if(/^\d+$/.test(String(x.jobNumber)))m.set(String(x.jobNumber),{...x})}
+ const m=new Map();for(const x of state.salesInstallHistory||[]){if(/^\d+$/.test(String(x.jobNumber))){const mtdSold=x.soldSource==='MTD' || (/MTD/i.test(String(x.source||''))&&!!x.soldDate);m.set(String(x.jobNumber),{...x,soldDate:mtdSold?x.soldDate:'',soldAt:mtdSold?x.soldAt:''})}}
  // Dynamic view includes latest production jobs even if the daily source imported before v0.48.
  for(const j of state.productionJobs||[]){
  const id=String(j.jobNumber||'');if(!/^\d+$/.test(id))continue;
  const p=m.get(id)||{jobNumber:id,soldDate:'',completedDate:'',soldAt:'',completedAt:'',tags:'',businessUnit:'',customer:'',jobStatus:''};
  const complete=COMPLETED_STATUSES.has(String(j.status||''));const done=complete?(salesIso(j.completionDate)||salesIso(j.date)):'';
  if(done&&(!p.completedDate||done>p.completedDate))p.completedDate=done;
- if(j.soldOn||j.soldDate){const s=salesIso(j.soldOn||j.soldDate);if(s&&(!p.soldDate||s<p.soldDate))p.soldDate=s}
  if(j.tagsRaw){const ts=new Set(String(p.tags||'').split(',').concat(String(j.tagsRaw).split(',')).map(s=>s.trim()).filter(Boolean));p.tags=[...ts].join(',')}
  p.customer=p.customer||j.customer||'';m.set(id,p);
  }
@@ -5439,9 +5521,6 @@ function salesAllRecords(){
   const bu=String(workflowValue(o,[/^business unit$/i])||'');if(!isPHLBathBusinessUnit(bu))continue;
   const id=String(workflowValue(o,[/^job\s*#$/i,/^job number$/i])||'');if(!/^\d+$/.test(id))continue;
   const p=m.get(id)||{jobNumber:id,soldDate:'',completedDate:'',soldAt:'',completedAt:'',tags:'',businessUnit:'',customer:'',jobStatus:''};
-  const sold=workflowValue(o,[/^sold on$/i,/^sold date$/i]);const s=salesIso(sold);
-  if(s&&(!p.soldDate||s<p.soldDate))p.soldDate=s;
-  if(!p.soldAt)p.soldAt=salesTimestamp(sold);
   const ts=[workflowValue(o,[/^job tags$/i]),workflowValue(o,[/^tags$/i])].filter(Boolean);
   if(ts.length){const tags=new Set(String(p.tags||'').split(',').concat(ts.join(',').split(',')).map(x=>x.trim()).filter(Boolean));p.tags=[...tags].join(',')}
   p.businessUnit=bu;p.customer=p.customer||workflowValue(o,[/^customer name$/i])||'';
@@ -5480,7 +5559,7 @@ function renderSalesProduction(){
  const typ=state.salesProductionConfig?.salesPeriod||'month',cur=salesPeriodRows(typ,asOf()),prev=salesPeriodRows(typ,previousSalesRef(typ,cur.range.start)),cov=salesReportCoverage();
  const delta=cur.average!=null&&prev.average!=null?cur.average-prev.average:null;
  el.innerHTML=pageHead('Sales → Production','PHL Bath and Costco Bath • sold date to actual installation completion',`<button class="btn" onclick="exportSection('sales')">Export Excel</button><div class="field"><label>Through date</label>${dateNav('salesAsOf',asOf(),'date',true)}</div>`)+`
- <div class="alert info"><b>Measurement rule:</b> completed jobs are grouped by completion date. Sale-to-install cycle time is Completion Date minus Sold On. Open/scheduled jobs do not count as completed. Date-only reports support calendar days, not verified hours.</div>
+ <div class="alert ${state.mtdCoverage?.hasSoldDate?'info':'warn'}"><b>MTD is the Sold-to-Install source.</b> ${state.mtdCoverage?.hasSoldDate?'Cycle time uses Sold On and Completion Date from your MTD report.':'For cycle times, upload an MTD report containing Sold On (or Sold Date) and Completion Date. Without a sold-date field, turnaround is unavailable; no separate report is required.'} Open jobs do not count as completed; date-only values are estimates.</div>
  <div class="sp-panel">${salesPeriodSelector('sales')}<h3>${esc(cur.range.label)}</h3><div class="sp-kpis">
  ${salesKpi('Completed installs',cur.completed.length,'With completion date')}${salesKpi('Matched sold + completed',cur.complete.length,cur.missing.length+' missing sold date')}${salesKpi('Average turnaround',salesFormatDays(cur.average),delta==null?'No comparable prior-period average':`${delta>0?'+':''}${num(delta,1)} days vs prior`)}${salesKpi('Median turnaround',salesFormatDays(cur.median),cur.complete.length?`${num(cur.within30/cur.complete.length*100,0)}% within 30 days`:'Awaiting sale dates')}${salesKpi('Known-sale install rate',cur.cohortRate==null?'—':cur.missing.length?'Incomplete':`${num(cur.cohortRate*100,1)}%`,`${cur.cohortCompleted.length}/${cur.soldCohort.length} known sales installed • ${cur.missing.length} completed jobs missing sold date`)}</div>
  ${cur.complete.length?`<div class="sp-strip"><span>0–7 days: ${cur.fast}</span><span>8–14: ${cur.complete.filter(x=>x.days>=8&&x.days<=14).length}</span><span>15–30: ${cur.complete.filter(x=>x.days>=15&&x.days<=30).length}</span><span>Over 30: ${cur.complete.filter(x=>x.days>30).length}</span></div>`:`<div class="sp-empty">No verified sold-to-completion pairs for this reporting period. Import an install history containing Job #, Sold On, and Completion Date.</div>`}
@@ -6446,7 +6525,8 @@ ${schedulerDailySnapshot(start)}
 }
 
 // ---------- Init ----------
-function bindGlobal(){buildNav();$('#modalClose').onclick=closeModal;$('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()};$('#mobileMenu').onclick=()=>$('#sidebar').classList.toggle('open');$('#globalBackup').onclick=exportBackup;$('#restoreInput').onchange=e=>e.target.files[0]&&restoreBackup(e.target.files[0]);document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)navigate(g.dataset.go)})}
+function ui081SetDensity(compact){document.body.classList.toggle('ui081-compact',!!compact);if(state){state.settings=state.settings||{};state.settings.compactUI=!!compact}const b=$('#ui081Density');if(b){b.textContent=compact?'Spacious view':'Compact view';b.setAttribute('aria-pressed',String(!!compact))}}
+function bindGlobal(){buildNav();ui081SetDensity(state?.settings?.compactUI!==false);$('#ui081Density').onclick=()=>{ui081SetDensity(!document.body.classList.contains('ui081-compact'));saveSoon()};$('#modalClose').onclick=closeModal;$('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()};$('#mobileMenu').onclick=()=>$('#sidebar').classList.toggle('open');$('#globalBackup').onclick=exportBackup;$('#restoreInput').onchange=e=>e.target.files[0]&&restoreBackup(e.target.files[0]);document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)navigate(g.dataset.go)})}
 async function rebuildCapacityAfterStartup(){
  try{refreshPayrollLeaveLinks();rebuildCapacityCrewHistory();rebuildWBRData();applyInitialCapacityConfirmations();saveSoon();if(currentView==='capacity'||currentView==='home')renderAll()}catch(e){state.startupWarnings=state.startupWarnings||[];state.startupWarnings.push(`Derived-data rebuild skipped: ${e.message||e}`);try{saveSoon();if(currentView==='home')renderHome()}catch(_){}}
 }
